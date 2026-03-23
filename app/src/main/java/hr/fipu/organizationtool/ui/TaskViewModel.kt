@@ -33,7 +33,7 @@ class TaskViewModel(
     fun addTask(title: String) {
         if (title.isBlank()) return
         val newTask = Task(id = nextId++, title = title)
-        _brainDumpTasks.value = _brainDumpTasks.value + newTask
+        _brainDumpTasks.value = listOf(newTask) + _brainDumpTasks.value
     }
 
     fun removeTask(task: Task) {
