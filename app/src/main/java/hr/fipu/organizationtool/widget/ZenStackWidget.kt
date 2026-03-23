@@ -1,7 +1,6 @@
 package hr.fipu.organizationtool.widget
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,8 +14,8 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.LinearProgressIndicator
 import androidx.glance.appwidget.action.actionRunCallback
-import androidx.glance.appwidget.action.actionStartActivity
-import androidx.glance.appwidget.cornerRadius
+import androidx.glance.appwidget.lazy.LazyColumn
+import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.*
 import androidx.glance.text.FontWeight
@@ -24,7 +23,6 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.text.TextDecoration
 import androidx.glance.unit.ColorProvider
-import hr.fipu.organizationtool.MainActivity
 import hr.fipu.organizationtool.data.AppDatabase
 import hr.fipu.organizationtool.data.Task
 import hr.fipu.organizationtool.data.TaskRepository
@@ -38,79 +36,60 @@ class ZenStackWidget : GlanceAppWidget() {
 
         provideContent {
             val priorityTasks by repository.priorityTasks.collectAsState(initial = emptyList())
-            val otherTasks by repository.getNonPriorityTasks(3).collectAsState(initial = emptyList())
+            val otherTasks by repository.allNonPriorityTasks.collectAsState(initial = emptyList())
             val completedCount = priorityTasks.count { it.status == "COMPLETED" }
             val progress = completedCount.toFloat() / priorityTasks.size.coerceAtLeast(1)
 
-            val clickIntent = Intent(context, MainActivity::class.java).apply {
-                action = MainActivity.ACTION_VIEW_TASKS
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-
-            Column(
-                modifier = GlanceModifier
-                    .fillMaxSize()
-                    .background(ColorProvider(ZenSurface))
-                    .cornerRadius(16.dp)
-                    .padding(12.dp)
-                    .clickable(actionStartActivity(clickIntent))
-            ) {
-                Row(
-                    modifier = GlanceModifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "ZenStack",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorProvider(ZenIndigo)
+            LazyColumn(modifier = GlanceModifier.fillMaxSize().background(ColorProvider(ZenSurface)).padding(12.dp)) {
+                // Header row: app name + completion count
+                item {
+                    Row(
+                        modifier = GlanceModifier.fillMaxWidth().padding(bottom = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "ZenStack",
+                            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorProvider(ZenIndigo))
                         )
-                    )
-                    Spacer(modifier = GlanceModifier.defaultWeight())
-                    Text(
-                        text = "$completedCount/${priorityTasks.size}",
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = ColorProvider(ZenGrayDark)
+                        Spacer(modifier = GlanceModifier.defaultWeight())
+                        Text(
+                            text = "$completedCount/${priorityTasks.size}",
+                            style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = ColorProvider(ZenGrayDark))
                         )
+                    }
+                }
+                // Progress bar
+                item {
+                    LinearProgressIndicator(
+                        progress = progress,
+                        modifier = GlanceModifier.fillMaxWidth().height(8.dp).padding(bottom = 12.dp),
+                        color = ColorProvider(ZenIndigo),
+                        backgroundColor = ColorProvider(Color.LightGray.copy(alpha = 0.2f))
                     )
                 }
-
-                Spacer(modifier = GlanceModifier.height(4.dp))
-
-                LinearProgressIndicator(
-                    progress = progress,
-                    modifier = GlanceModifier.fillMaxWidth().height(8.dp),
-                    color = ColorProvider(ZenIndigo),
-                    backgroundColor = ColorProvider(Color.LightGray.copy(alpha = 0.2f))
-                )
-
-                Spacer(modifier = GlanceModifier.height(12.dp))
-
-                Text(
-                    text = "Priority",
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp,
-                        color = ColorProvider(ZenGrayDark)
+                // Priority section header
+                item {
+                    Text(
+                        text = "Priority",
+                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 13.sp, color = ColorProvider(ZenGrayDark)),
+                        modifier = GlanceModifier.padding(bottom = 4.dp)
                     )
-                )
-                priorityTasks.forEach { task ->
+                }
+                // Priority task rows — no cap, all tasks
+                items(priorityTasks) { task ->
                     TaskItem(task)
                 }
-
+                // Brain dump section header (only shown when non-priority tasks exist)
                 if (otherTasks.isNotEmpty()) {
-                    Spacer(modifier = GlanceModifier.height(12.dp))
-                    Text(
-                        text = "Brain Dump",
-                        style = TextStyle(
-                            fontSize = 11.sp,
-                            color = ColorProvider(ZenGrayDark.copy(alpha = 0.6f))
+                    item {
+                        Text(
+                            text = "Brain Dump",
+                            style = TextStyle(fontSize = 11.sp, color = ColorProvider(ZenGrayDark.copy(alpha = 0.6f))),
+                            modifier = GlanceModifier.padding(top = 12.dp, bottom = 4.dp)
                         )
-                    )
-                    otherTasks.forEach { task ->
+                    }
+                    // Brain dump task rows — no cap, all tasks
+                    items(otherTasks) { task ->
                         TaskItem(task, isSmall = true)
                     }
                 }
