@@ -1,6 +1,7 @@
 package hr.fipu.organizationtool.widget
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -11,9 +12,11 @@ import androidx.glance.*
 import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.LinearProgressIndicator
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.*
 import androidx.glance.text.FontWeight
@@ -24,21 +27,18 @@ import androidx.glance.unit.ColorProvider
 import hr.fipu.organizationtool.MainActivity
 import hr.fipu.organizationtool.data.AppDatabase
 import hr.fipu.organizationtool.data.Task
+import hr.fipu.organizationtool.data.TaskRepository
 import hr.fipu.organizationtool.ui.theme.ZenGrayDark
 import hr.fipu.organizationtool.ui.theme.ZenIndigo
 import hr.fipu.organizationtool.ui.theme.ZenSurface
 
-import androidx.glance.appwidget.appWidgetBackgroundRadius
-import android.content.Intent
-
 class ZenStackWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val dao = AppDatabase.getDatabase(context).taskDao()
+        val repository = TaskRepository(AppDatabase.getDatabase(context).taskDao())
 
         provideContent {
-            val tasks by dao.getAllTasks().collectAsState(initial = emptyList())
-            val priorityTasks = tasks.filter { it.isPriority }
-            val otherTasks = tasks.filter { !it.isPriority }
+            val priorityTasks by repository.priorityTasks.collectAsState(initial = emptyList())
+            val otherTasks by repository.getNonPriorityTasks(3).collectAsState(initial = emptyList())
             val completedCount = priorityTasks.count { it.status == "COMPLETED" }
             val progress = completedCount.toFloat() / priorityTasks.size.coerceAtLeast(1)
 
@@ -51,15 +51,15 @@ class ZenStackWidget : GlanceAppWidget() {
                 modifier = GlanceModifier
                     .fillMaxSize()
                     .background(ColorProvider(ZenSurface))
-                    .appWidgetBackgroundRadius()
+                    .cornerRadius(16.dp)
                     .padding(12.dp)
                     .clickable(actionStartActivity(clickIntent))
             ) {
                 Row(
                     modifier = GlanceModifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
                     verticalAlignment = Alignment.CenterVertically
-                ) {                    Text(
+                ) {
+                    Text(
                         text = "ZenStack",
                         style = TextStyle(
                             fontSize = 16.sp,
@@ -86,9 +86,9 @@ class ZenStackWidget : GlanceAppWidget() {
                     color = ColorProvider(ZenIndigo),
                     backgroundColor = ColorProvider(Color.LightGray.copy(alpha = 0.2f))
                 )
-                
+
                 Spacer(modifier = GlanceModifier.height(12.dp))
-                
+
                 Text(
                     text = "Priority",
                     style = TextStyle(
@@ -110,7 +110,7 @@ class ZenStackWidget : GlanceAppWidget() {
                             color = ColorProvider(ZenGrayDark.copy(alpha = 0.6f))
                         )
                     )
-                    otherTasks.take(3).forEach { task ->
+                    otherTasks.forEach { task ->
                         TaskItem(task, isSmall = true)
                     }
                 }
@@ -148,4 +148,8 @@ class ZenStackWidget : GlanceAppWidget() {
             )
         }
     }
+}
+
+class ZenStackWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = ZenStackWidget()
 }
