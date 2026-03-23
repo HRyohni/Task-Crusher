@@ -13,6 +13,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 val appModule = module {
     single { AppDatabase.getDatabase(androidContext()) }
     single { get<AppDatabase>().taskDao() }
+    single { get<AppDatabase>().achievementDao() }
     single { TaskRepository(get()) }
     single { OnboardingRepository(androidContext()) }
     viewModel { TaskViewModel(get(), get(), androidApplication()) }
