@@ -39,9 +39,10 @@ class ToggleTaskCallback : ActionCallback {
         val task = tasks.find { it.id == taskId }
         task?.let {
             val nextStatus = if (it.status == "COMPLETED") "TODO" else "COMPLETED"
-            val updatedTask = it.copy(status = nextStatus)
+            val nextCompletedAt = if (nextStatus == "COMPLETED") System.currentTimeMillis() else null
+            val updatedTask = it.copy(status = nextStatus, completedAt = nextCompletedAt)
             dao.updateTask(updatedTask)
-            
+
             if (updatedTask.status == "COMPLETED") {
                 playSuccessSound(context)
             }

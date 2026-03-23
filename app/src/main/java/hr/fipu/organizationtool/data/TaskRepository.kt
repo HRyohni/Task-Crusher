@@ -34,6 +34,10 @@ class TaskRepository(private val taskDao: TaskDao) {
     
     suspend fun toggleTaskCompletion(task: Task) {
         val newStatus = if (task.status == "COMPLETED") "TODO" else "COMPLETED"
-        updateTask(task.copy(status = newStatus))
+        val newCompletedAt = if (newStatus == "COMPLETED") System.currentTimeMillis() else null
+        updateTask(task.copy(status = newStatus, completedAt = newCompletedAt))
     }
+
+    fun getTasksCompletedOn(startOfDay: Long, endOfDay: Long): Flow<List<Task>> =
+        taskDao.getTasksCompletedOn(startOfDay, endOfDay)
 }
