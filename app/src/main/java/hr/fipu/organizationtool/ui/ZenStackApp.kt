@@ -36,7 +36,14 @@ import hr.fipu.organizationtool.ui.theme.zenShadow
 import hr.fipu.organizationtool.ui.theme.zenSpring
 import hr.fipu.organizationtool.ui.components.BackTapOnboarding
 import kotlinx.coroutines.delay
+import nl.dionsegijn.konfetti.compose.KonfettiView
+import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
+import nl.dionsegijn.konfetti.core.Party
+import nl.dionsegijn.konfetti.core.PartySystem
+import nl.dionsegijn.konfetti.core.Position
+import nl.dionsegijn.konfetti.core.emitter.Emitter
 import org.koin.androidx.compose.koinViewModel
+import java.util.concurrent.TimeUnit
 
 enum class MainTab { TODAY, CALENDAR, ACHIEVEMENTS }
 
@@ -198,47 +205,74 @@ fun CurrentTasksView(
     val priorityTasks = tasks.filter { it.isPriority }
     val otherTasks = tasks.filter { !it.isPriority }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = onRestart) {
-                Icon(Icons.Default.Refresh, contentDescription = "New Session")
-            }
-        }
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                Text("Focus Mode", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-                Text(
-                    "Tasks Done: ${priorityTasks.count { it.status == "COMPLETED" }}/${priorityTasks.size}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+    val allComplete = priorityTasks.isNotEmpty() && priorityTasks.all { it.status == "COMPLETED" }
 
-            item { Text("Top 3 Priorities", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary) }
-            
-            items(priorityTasks) { task ->
-                TaskCard(task, isPriority = true) {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onToggleComplete(task)
+    // One-shot: only show confetti once when the transition to allComplete happens.
+    // Reset when tasks change (new session loaded).
+    var confettiShown by remember(tasks.map { it.id }.toSet()) { mutableStateOf(false) }
+    val showConfetti = allComplete && !confettiShown
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            floatingActionButton = {
+                FloatingActionButton(onClick = onRestart) {
+                    Icon(Icons.Default.Refresh, contentDescription = "New Session")
                 }
             }
+        ) { padding ->
+            LazyColumn(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    Text("Focus Mode", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                    Text(
+                        "Tasks Done: ${priorityTasks.count { it.status == "COMPLETED" }}/${priorityTasks.size}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
 
-            if (otherTasks.isNotEmpty()) {
-                item { Spacer(modifier = Modifier.height(8.dp)) }
-                item { Text("Brain Dump", style = MaterialTheme.typography.titleMedium) }
-                items(otherTasks) { task ->
-                    TaskCard(task, isPriority = false) {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                item { Text("Top 3 Priorities", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary) }
+
+                items(priorityTasks) { task ->
+                    TaskCard(task, isPriority = true) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onToggleComplete(task)
                     }
                 }
+
+                if (otherTasks.isNotEmpty()) {
+                    item { Spacer(modifier = Modifier.height(8.dp)) }
+                    item { Text("Brain Dump", style = MaterialTheme.typography.titleMedium) }
+                    items(otherTasks) { task ->
+                        TaskCard(task, isPriority = false) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onToggleComplete(task)
+                        }
+                    }
+                }
             }
+        }
+
+        if (showConfetti) {
+            val parties = listOf(
+                Party(
+                    emitter = Emitter(duration = 3, TimeUnit.SECONDS).perSecond(100),
+                    position = Position.Relative(0.5, 0.0)
+                )
+            )
+            KonfettiView(
+                modifier = Modifier.fillMaxSize(),
+                parties = parties,
+                updateListener = object : OnParticleSystemUpdateListener {
+                    override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
+                        if (activeSystems == 0) confettiShown = true
+                    }
+                }
+            )
         }
     }
 }
