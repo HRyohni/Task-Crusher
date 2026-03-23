@@ -1,14 +1,19 @@
-# ZenStack v1 Requirements
+# Requirements: ZenStack
 
-## v1 Requirements
+**Defined:** 2026-03-23
+**Core Value:** Focus through Frictionless Intent: Minimize the gap between a thought and its capture, then force a choice to prevent paralysis.
+
+---
+
+## v1.0 Requirements (Previous Milestone)
 
 ### CORE: Foundation & Data
-- [ ] **CORE-01**: Setup Kotlin 2.1 (K2) and Material 3 Expressive (1.4.0) foundation.
+- [x] **CORE-01**: Setup Kotlin 2.1 (K2) and Material 3 Expressive foundation.
 - [ ] **CORE-02**: Room KMP Repository as Single Source of Truth for tasks and session state.
 
 ### DUMP: The Brain Dump
 - [x] **DUMP-01**: "Void Input" - Minimalist, full-screen text entry for rapid task capture.
-- [ ] **DUMP-02**: "Tactile Tags" - Visual representation of tasks as bubbles with spring-based motion (`AnchoredDraggable`).
+- [ ] **DUMP-02**: "Tactile Tags" - Visual representation of tasks as bubbles with spring-based motion.
 - [ ] **DUMP-03**: Interaction Layer - Tap to edit, 'X' to delete tags in real-time.
 
 ### PRIO: The Power 3
@@ -17,38 +22,102 @@
 - [ ] **PRIO-03**: Visual Dimming - Dynamic UI feedback for non-selected items when limit is reached.
 
 ### WIDG: The Glance Widget
-- [ ] **WIDG-01**: Glance 1.2.0 Interactive Widget - Display Top 3 and "Progress Tracker" (e.g., 1/3 Done).
-- [ ] **WIDG-02**: Widget Action Loop - Check off tasks directly from home screen with `ActionCallback` sync to Room.
-- [ ] **WIDG-03**: Success Audio - `SoundPool` implementation for low-latency "ding" on task completion.
+- [ ] **WIDG-01**: Glance Interactive Widget - Display Top 3 and Progress Tracker (e.g., 1/3 Done).
+- [ ] **WIDG-02**: Widget Action Loop - Check off tasks directly from home screen with sync to Room.
+- [ ] **WIDG-03**: Success Audio - SoundPool implementation for low-latency "ding" on task completion.
 
 ### GEST: Frictionless Access
-- [x] **GEST-01**: Back Tap Gesture - Accessibility Service or Shortcut to launch ZenStack via double-tap.
+- [x] **GEST-01**: Back Tap Gesture - Accessibility Service to launch ZenStack via double-tap.
 - [x] **GEST-02**: Onboarding Guide - In-app visual "How-To" for system-level gesture mapping.
 
+---
+
+## v1.1 Requirements (Current Milestone — Engagement)
+
+### BUG: Data Integrity Fixes
+- [ ] **BUG-01**: App uses proper Room migrations instead of destructive fallback so users never lose tasks on update
+- [ ] **BUG-02**: Back-tap onboarding guide shows correctly on first install (fix false default in hasSeenBackTapGuide)
+- [ ] **BUG-03**: `saveSession` correctly upserts suggested tasks without duplicating DB entries
+- [ ] **BUG-04**: Room schema export enabled for migration tracking
+
+### PERF: Performance Fixes
+- [ ] **PERF-01**: Widget uses targeted DAO queries instead of fetching all tasks
+- [ ] **PERF-02**: Accelerometer uses SENSOR_DELAY_NORMAL instead of SENSOR_DELAY_UI to reduce battery drain
+- [ ] **PERF-03**: Widget accesses data through TaskRepository instead of directly instantiating AppDatabase
+
+### UX: Core UX Improvements
+- [ ] **UX-01**: User sees a confetti animation when all 3 priority tasks are marked complete
+- [ ] **UX-02**: User can tap a deep-link button in the back-tap setup screen that opens the exact Android accessibility settings page
+
+### NAV: Bottom Navigation
+- [ ] **NAV-01**: App has a bottom navigation bar with Today, Calendar, and Achievements tabs
+- [ ] **NAV-02**: Today tab preserves the existing session/task UI unchanged
+
+### WIDG: Widget Enhancements
+- [ ] **WIDG-04**: Widget is scrollable and displays all priority tasks (not capped)
+- [ ] **WIDG-05**: Widget scrollable section shows brain dump (non-priority) tasks below priorities
+
+### CAL: Calendar Tab
+- [ ] **CAL-01**: Calendar tab shows a GitHub-style activity heatmap (days colored by tasks completed)
+- [ ] **CAL-02**: User can tap a day on the heatmap to see a list of tasks completed that day
+- [ ] **CAL-03**: App records task completion timestamp so history is queryable by date
+
+### ACH: Achievements Tab
+- [ ] **ACH-01**: App tracks daily streaks (consecutive days with at least one completed session)
+- [ ] **ACH-02**: App tracks volume milestones (10, 50, 100 total tasks completed)
+- [ ] **ACH-03**: App tracks speed runs (all 3 priorities completed within 1 hour of session start)
+- [ ] **ACH-04**: User sees a pop-up notification when a new achievement is unlocked
+- [ ] **ACH-05**: Achievements tab displays all achievements (locked/unlocked) with progress indicators
+
+---
+
 ## v2 Requirements (Deferred)
-- [ ] Cloud Sync & Multi-device Support
-- [ ] Historical Focus Session Analytics
-- [ ] Customizable Audio Themes
+
+- Cloud Sync & Multi-device Support
+- Historical Focus Session Analytics
+- Customizable Audio Themes
+- Recurring Tasks
 
 ## Out of Scope
-- Recurring Tasks (Focus is on the immediate "now")
-- Complex Tagging/Categorization (Minimalism first)
-- Non-Android Platforms (Platform-native focus)
+
+| Feature | Reason |
+|---------|--------|
+| Multiple Lists | One focus session at a time — minimalism first |
+| Cloud Sync | MVP is local-only for privacy/speed |
+| Non-Android Platforms | Platform-native focus |
+| Complex Tagging | Minimalism first |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1 | Pending |
-| CORE-02 | Phase 1 | Pending |
-| DUMP-01 | Phase 2 | Complete |
-| DUMP-02 | Phase 5 | Pending |
-| DUMP-03 | Phase 5 | Pending |
-| PRIO-01 | Phase 2 | Pending |
-| PRIO-02 | Phase 2 | Pending |
-| PRIO-03 | Phase 2 | Pending |
-| WIDG-01 | Phase 3 | Pending |
-| WIDG-02 | Phase 3 | Pending |
-| WIDG-03 | Phase 6 | Pending |
-| GEST-01 | Phase 4 | Complete |
-| GEST-02 | Phase 4 | Complete |
+| BUG-01 | Phase 7 | Pending |
+| BUG-02 | Phase 7 | Pending |
+| BUG-03 | Phase 7 | Pending |
+| BUG-04 | Phase 7 | Pending |
+| PERF-01 | Phase 7 | Pending |
+| PERF-02 | Phase 7 | Pending |
+| PERF-03 | Phase 7 | Pending |
+| UX-01 | Phase 8 | Pending |
+| UX-02 | Phase 7 | Pending |
+| NAV-01 | Phase 8 | Pending |
+| NAV-02 | Phase 8 | Pending |
+| WIDG-04 | Phase 9 | Pending |
+| WIDG-05 | Phase 9 | Pending |
+| CAL-01 | Phase 10 | Pending |
+| CAL-02 | Phase 10 | Pending |
+| CAL-03 | Phase 9 | Pending |
+| ACH-01 | Phase 11 | Pending |
+| ACH-02 | Phase 11 | Pending |
+| ACH-03 | Phase 11 | Pending |
+| ACH-04 | Phase 11 | Pending |
+| ACH-05 | Phase 11 | Pending |
+
+**Coverage:**
+- v1.1 requirements: 21 total
+- Mapped to phases: 21
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-03-23*
+*Last updated: 2026-03-23 after v1.1 milestone start*
