@@ -109,7 +109,9 @@
   1. A bottom navigation bar with Today, Calendar, and Achievements tabs is visible throughout the app.
   2. Tapping "Today" shows the same session/task UI that existed before bottom nav was added — nothing regresses.
   3. Completing all 3 priority tasks triggers a full-screen confetti animation.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 08-01-PLAN.md — Bottom nav shell + konfetti dependency (NAV-01, NAV-02)
+- [ ] 08-02-PLAN.md — Confetti celebration overlay on all-complete (UX-01)
 
 ### Phase 9: Scrollable Widget & Completion History
 **Goal**: The home screen widget shows the full task picture, and the app starts recording when tasks are completed so history can be queried by date.
@@ -154,7 +156,7 @@
 | 5. Tactile Interaction | 0/1 | Not started | - |
 | 6. Sensory Feedback & Polish | 0/1 | Not started | - |
 | 7. Stability & Quick Wins | 0/3 | Not started | - |
-| 8. Navigation Shell & Confetti | 0/? | Not started | - |
+| 8. Navigation Shell & Confetti | 0/2 | Not started | - |
 | 9. Scrollable Widget & Completion History | 0/? | Not started | - |
 | 10. Calendar Tab | 0/? | Not started | - |
 | 11. Achievements Tab | 0/? | Not started | - |
