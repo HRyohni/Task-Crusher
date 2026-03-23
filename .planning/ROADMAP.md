@@ -18,7 +18,11 @@
 **Success Criteria**:
   1. App compiles and runs with Kotlin 2.1 and Material 3 Expressive theme.
   2. Room database successfully persists and retrieves a test task.
-**Plans**: TBD
+**Plans**:
+- [ ] 01-01-PLAN.md — Core Infrastructure & Tooling Upgrade (Kotlin 2.1, KSP, Koin 4.0)
+- [ ] 01-02-PLAN.md — Zen Design System Implementation (M3 Expressive, Palette, Physics)
+- [ ] 01-03-PLAN.md — Room KMP Data Layer (Multi-Instance Invalidation, Repository)
+- [ ] 01-04-PLAN.md — Foundation Verification (Integration Lab Screen)
 
 ### Phase 2: The Core Loop (Brain Dump & Prioritization)
 **Goal**: Deliver the primary user workflow: capturing thoughts and forcing a choice of 3 priorities.
@@ -76,7 +80,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Data Architecture | 0/1 | Not started | - |
+| 1. Foundation & Data Architecture | 0/4 | Not started | - |
 | 2. The Core Loop | 0/1 | Not started | - |
 | 3. Glance Widget Integration | 0/1 | Not started | - |
 | 4. Frictionless Access (Back Tap) | 0/1 | Not started | - |
