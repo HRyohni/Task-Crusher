@@ -12,8 +12,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,6 +38,8 @@ import hr.fipu.organizationtool.ui.components.BackTapOnboarding
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
+enum class MainTab { TODAY, CALENDAR, ACHIEVEMENTS }
+
 @Composable
 fun ZenStackApp(viewModel: TaskViewModel = koinViewModel()) {
     val savedTasks by viewModel.savedTasks.collectAsState()
@@ -49,13 +56,71 @@ fun ZenStackApp(viewModel: TaskViewModel = koinViewModel()) {
     if (showSetup || savedTasks == null) {
         SetupFlow(viewModel) { showSetup = false }
     } else {
-        CurrentTasksView(
+        MainShell(
             tasks = savedTasks!!,
             onRestart = { showSetup = true },
-            onToggleComplete = { task ->
-                viewModel.toggleTaskCompletion(task)
-            }
+            onToggleComplete = { task -> viewModel.toggleTaskCompletion(task) }
         )
+    }
+}
+
+@Composable
+fun MainShell(
+    tasks: List<Task>,
+    onRestart: () -> Unit,
+    onToggleComplete: (Task) -> Unit
+) {
+    var selectedTab by remember { mutableStateOf(MainTab.TODAY) }
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(
+                    selected = selectedTab == MainTab.TODAY,
+                    onClick = { selectedTab = MainTab.TODAY },
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Today") },
+                    label = { Text("Today") }
+                )
+                NavigationBarItem(
+                    selected = selectedTab == MainTab.CALENDAR,
+                    onClick = { selectedTab = MainTab.CALENDAR },
+                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar") },
+                    label = { Text("Calendar") }
+                )
+                NavigationBarItem(
+                    selected = selectedTab == MainTab.ACHIEVEMENTS,
+                    onClick = { selectedTab = MainTab.ACHIEVEMENTS },
+                    icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Achievements") },
+                    label = { Text("Achievements") }
+                )
+            }
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+            when (selectedTab) {
+                MainTab.TODAY -> CurrentTasksView(
+                    tasks = tasks,
+                    onRestart = onRestart,
+                    onToggleComplete = onToggleComplete
+                )
+                MainTab.CALENDAR -> CalendarPlaceholder()
+                MainTab.ACHIEVEMENTS -> AchievementsPlaceholder()
+            }
+        }
+    }
+}
+
+@Composable
+fun CalendarPlaceholder() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Calendar — coming soon", style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+fun AchievementsPlaceholder() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Achievements — coming soon", style = MaterialTheme.typography.bodyLarge)
     }
 }
 
