@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -51,9 +53,9 @@ enum class MainTab { TODAY, CALENDAR, ACHIEVEMENTS }
 @Composable
 fun ZenStackApp(viewModel: TaskViewModel = koinViewModel()) {
     val savedTasks by viewModel.savedTasks.collectAsState()
-    
+
     var showSetup by remember { mutableStateOf(false) }
-    
+
     // Determine if we should show setup or current tasks
     LaunchedEffect(savedTasks) {
         if (savedTasks != null && savedTasks!!.isEmpty()) {
@@ -64,19 +66,47 @@ fun ZenStackApp(viewModel: TaskViewModel = koinViewModel()) {
     val completionHistory by viewModel.completionHistory.collectAsState()
     val selectedDay by viewModel.selectedDay.collectAsState()
     val tasksForSelectedDay by viewModel.tasksForSelectedDay.collectAsState()
+    val newlyUnlockedAchievement by viewModel.newlyUnlockedAchievement.collectAsState()
+    val achievements by viewModel.achievements.collectAsState()
 
-    if (showSetup || savedTasks == null) {
-        SetupFlow(viewModel) { showSetup = false }
-    } else {
-        MainShell(
-            tasks = savedTasks!!,
-            onRestart = { showSetup = true },
-            onToggleComplete = { task -> viewModel.toggleTaskCompletion(task) },
-            completionHistory = completionHistory,
-            selectedDay = selectedDay,
-            tasksForSelectedDay = tasksForSelectedDay,
-            onDaySelected = { date -> viewModel.selectDay(date) }
-        )
+    LaunchedEffect(newlyUnlockedAchievement) {
+        if (newlyUnlockedAchievement != null) {
+            delay(4000)
+            viewModel.dismissAchievementUnlock()
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (showSetup || savedTasks == null) {
+            SetupFlow(viewModel) { showSetup = false }
+        } else {
+            MainShell(
+                tasks = savedTasks!!,
+                onRestart = { showSetup = true },
+                onToggleComplete = { task -> viewModel.toggleTaskCompletion(task) },
+                completionHistory = completionHistory,
+                selectedDay = selectedDay,
+                tasksForSelectedDay = tasksForSelectedDay,
+                onDaySelected = { date -> viewModel.selectDay(date) },
+                achievements = achievements
+            )
+        }
+
+        AnimatedVisibility(
+            visible = newlyUnlockedAchievement != null,
+            enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { -it }),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 24.dp, start = 16.dp, end = 16.dp)
+        ) {
+            newlyUnlockedAchievement?.let { achievement ->
+                AchievementUnlockBanner(
+                    achievement = achievement,
+                    onDismiss = { viewModel.dismissAchievementUnlock() }
+                )
+            }
+        }
     }
 }
 
@@ -88,7 +118,8 @@ fun MainShell(
     completionHistory: Map<LocalDate, Int>,
     selectedDay: LocalDate?,
     tasksForSelectedDay: List<Task>,
-    onDaySelected: (LocalDate) -> Unit
+    onDaySelected: (LocalDate) -> Unit,
+    achievements: List<Achievement>
 ) {
     var selectedTab by remember { mutableStateOf(MainTab.TODAY) }
 
@@ -130,16 +161,55 @@ fun MainShell(
                     onDaySelected = onDaySelected,
                     modifier = Modifier.fillMaxSize()
                 )
-                MainTab.ACHIEVEMENTS -> AchievementsPlaceholder()
+                MainTab.ACHIEVEMENTS -> AchievementsScreen(
+                    achievements = achievements,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }
 }
 
 @Composable
-fun AchievementsPlaceholder() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Achievements — coming soon", style = MaterialTheme.typography.bodyLarge)
+fun AchievementUnlockBanner(achievement: Achievement, onDismiss: () -> Unit) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onDismiss() },
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.primaryContainer,
+        tonalElevation = 8.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                Icons.Default.EmojiEvents,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(32.dp)
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    "Achievement Unlocked!",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    achievement.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    achievement.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
 
