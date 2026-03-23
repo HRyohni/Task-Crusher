@@ -16,5 +16,5 @@ val appModule = module {
     single { get<AppDatabase>().achievementDao() }
     single { TaskRepository(get()) }
     single { OnboardingRepository(androidContext()) }
-    viewModel { TaskViewModel(get(), get(), androidApplication()) }
+    viewModel { TaskViewModel(get(), get(), get(), androidApplication()) }
 }
