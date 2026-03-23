@@ -1,0 +1,84 @@
+# ZenStack Roadmap
+
+## Phases
+
+- [ ] **Phase 1: Foundation & Data Architecture** - Establish the Kotlin 2.1/M3 foundation and Room Single Source of Truth.
+- [ ] **Phase 2: The Core Loop (Brain Dump & Prioritization)** - Implement rapid task capture and the "Power 3" selection logic.
+- [ ] **Phase 3: Glance Widget Integration** - Connect the Room DB to an interactive home screen widget with sync loop.
+- [ ] **Phase 4: Frictionless Access (Back Tap)** - Implement Accessibility Service for double-tap launch and onboarding.
+- [ ] **Phase 5: Tactile Interaction (Advanced UI)** - Add spring-based animations and interactive "bubbles" to the dump.
+- [ ] **Phase 6: Sensory Feedback & Polish** - Implement low-latency audio rewards and final refinements.
+
+## Phase Details
+
+### Phase 1: Foundation & Data Architecture
+**Goal**: Establish a robust technical foundation and the data layer that will serve both App and Widget.
+**Depends on**: Nothing
+**Requirements**: CORE-01, CORE-02
+**Success Criteria**:
+  1. App compiles and runs with Kotlin 2.1 and Material 3 Expressive theme.
+  2. Room database successfully persists and retrieves a test task.
+**Plans**: TBD
+
+### Phase 2: The Core Loop (Brain Dump & Prioritization)
+**Goal**: Deliver the primary user workflow: capturing thoughts and forcing a choice of 3 priorities.
+**Depends on**: Phase 1
+**Requirements**: DUMP-01, PRIO-01, PRIO-02, PRIO-03
+**Success Criteria**:
+  1. User can type a task in a minimalist "Void Input" and see it saved to the list.
+  2. User can select exactly 3 tasks from the pool for their session.
+  3. User is prevented from selecting a 4th task, with non-selected items dimming dynamically.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 3: Glance Widget Integration
+**Goal**: Bridge the App and Home Screen via a synchronized Glance widget.
+**Depends on**: Phase 2
+**Requirements**: WIDG-01, WIDG-02
+**Success Criteria**:
+  1. User can add the ZenStack widget to their home screen and see their current Top 3 tasks.
+  2. User can check off a task directly on the widget, updating the Room DB state.
+  3. The widget's progress tracker (e.g., "1/3 Done") updates immediately upon task completion.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 4: Frictionless Access (Back Tap)
+**Goal**: Minimize the gap between thought and action with gesture-based launching.
+**Depends on**: Phase 1
+**Requirements**: GEST-01, GEST-02
+**Success Criteria**:
+  1. User can launch the ZenStack app by double-tapping the back of their device.
+  2. User can complete a visual onboarding guide that explains how to enable system-level gestures.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 5: Tactile Interaction (Advanced UI)
+**Goal**: Enhance the "Brain Dump" with the intended tactile, physics-based feel.
+**Depends on**: Phase 2
+**Requirements**: DUMP-02, DUMP-03
+**Success Criteria**:
+  1. Captured tasks appear as floating bubbles with spring-based motion.
+  2. User can tap an 'X' on a bubble to delete it with a visual "pop".
+  3. User can tap a bubble to edit the existing task text.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 6: Sensory Feedback & Polish
+**Goal**: Add the final layer of satisfaction and handle system-level edge cases.
+**Depends on**: Phase 3
+**Requirements**: WIDG-03
+**Success Criteria**:
+  1. A low-latency "success" sound plays when a task is checked off via the widget.
+  2. Audio feedback respects the device's "Do Not Disturb" and silent mode settings.
+**Plans**: TBD
+
+## Progress Table
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Foundation & Data Architecture | 0/1 | Not started | - |
+| 2. The Core Loop | 0/1 | Not started | - |
+| 3. Glance Widget Integration | 0/1 | Not started | - |
+| 4. Frictionless Access (Back Tap) | 0/1 | Not started | - |
+| 5. Tactile Interaction | 0/1 | Not started | - |
+| 6. Sensory Feedback & Polish | 0/1 | Not started | - |
