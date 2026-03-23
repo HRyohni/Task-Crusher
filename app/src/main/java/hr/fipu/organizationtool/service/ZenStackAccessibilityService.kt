@@ -4,7 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
-import android.hardware.DisplayManager
+import android.hardware.display.DisplayManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -86,7 +86,7 @@ class ZenStackAccessibilityService : AccessibilityService(), SensorEventListener
         val display = displayManager.getDisplay(Display.DEFAULT_DISPLAY)
         if (display?.state == Display.STATE_ON) {
             accelerometer?.let {
-                sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
+                sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
             }
         } else {
             sensorManager.unregisterListener(this)
