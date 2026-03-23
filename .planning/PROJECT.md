@@ -40,8 +40,21 @@ ZenStack addresses "choice paralysis" by guiding users through a "Session" that 
 | **Tactile Dump** | Physics-based or animated "bubbles" for tactile feel | Pending |
 | **Audio** | Integrated "Success" sound (Standard GSD choice) | Pending |
 
+## Current Milestone: v1.1 Engagement
+
+**Goal:** Transform ZenStack from a focused task tool into a rewarding, habit-forming app with richer UX, engagement loops, and data integrity.
+
+**Target features:**
+- Critical bug fixes (DB migrations, widget performance, sensor battery drain)
+- Confetti explosion when all 3 priority tasks are completed
+- Scrollable widget showing all tasks (priority + brain dump)
+- Deep-link button directly to accessibility settings for double-tap setup
+- Bottom navigation bar (Today, Calendar, Achievements)
+- Calendar tab — GitHub-style activity heatmap + tappable day detail
+- Achievements tab — streaks, volume milestones, speed runs with pop-up notifications
+
 ## Evolution
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: March 23, 2026 after initialization*
+*Last updated: March 23, 2026 after v1.1 milestone started*
