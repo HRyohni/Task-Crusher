@@ -44,6 +44,8 @@ progress:
 - (2026-03-23) **v1.1 Roadmap**: 5 phases (7-11) grouped as: stability first (Phase 7), then nav shell (Phase 8), then widget + history (Phase 9), then calendar (Phase 10), then achievements (Phase 11). CAL-03 placed in Phase 9 (not 10) because the calendar tab (Phase 10) depends on timestamps being recorded first.
 - [Phase 07]: Migration 2->3 is no-op placeholder establishing safe upgrade path, removes destructive fallback
 - [Phase 07]: Widget uses TaskRepository pattern with SQL LIMIT-bounded queries, never AppDatabase directly
+- [Phase 07]: hasSeenBackTapGuide initial value false is correct semantic for fresh-install guard; true was a bug
+- [Phase 07]: Deep-link to Settings.ACTION_ACCESSIBILITY_SETTINGS with FLAG_ACTIVITY_NEW_TASK for onboarding UX
 
 ### Todos
 
@@ -56,7 +58,7 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-23T21:15:49.259Z
+2026-03-23T22:07:43.217Z
 
 - Started milestone v1.1 Engagement — defined 21 requirements across BUG, PERF, UX, NAV, WIDG, CAL, ACH categories.
 - Created roadmap Phases 7-11 with 100% requirement coverage.
