@@ -52,12 +52,12 @@ class ToggleTaskCallback : ActionCallback {
     }
 
     private fun playSuccessSound(context: Context) {
-        // Note: In a real app, you'd need a sound file in res/raw/success_ding.mp3
-        // For now, we'll just use a system sound or placeholder logic
         try {
-            val mp = MediaPlayer.create(context, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
-            mp.start()
-            mp.setOnCompletionListener { it.release() }
+            val mp = MediaPlayer.create(context, hr.fipu.organizationtool.R.raw.zen_success)
+            mp?.apply {
+                start()
+                setOnCompletionListener { it.release() }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
