@@ -53,6 +53,8 @@ progress:
 - [Phase 09]: MIGRATION_3_4 uses ALTER TABLE tasks ADD COLUMN completedAt INTEGER DEFAULT NULL — nullable column safe for existing rows
 - [Phase 09]: Both MIGRATION_2_3 and MIGRATION_3_4 registered in databaseBuilder to support upgrades from v2 and v3
 - [Phase 09]: completedAt stamp pattern: newStatus == COMPLETED -> System.currentTimeMillis() else null, applied identically in Repository and widget callback
+- [Phase 09]: allNonPriorityTasks uses getNonPriorityTasks(Int.MAX_VALUE) — reuses existing DAO query without adding a new method
+- [Phase 09]: Glance LazyColumn replaces Column+forEach for scrollable widget; widget-wide clickable removed (conflicts with scroll); individual row clicks preserved
 
 ### Todos
 
@@ -65,7 +67,7 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-23T22:36:36.373Z
+2026-03-23T22:38:30.911Z
 
 - Executed Phase 8: Navigation Shell & Confetti (Plans 08-01 and 08-02).
 - Added konfetti-compose 2.0.5 dependency.
