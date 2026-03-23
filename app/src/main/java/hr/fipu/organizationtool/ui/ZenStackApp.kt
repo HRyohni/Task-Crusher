@@ -208,21 +208,28 @@ fun BrainDumpStep(
     onNext: () -> Unit
 ) {
     var text by remember { mutableStateOf("") }
+    val haptic = LocalHapticFeedback.current
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Text("Step 1: Brain Dump", style = MaterialTheme.typography.titleMedium)
-        Text("Get everything out of your head.", style = MaterialTheme.typography.bodySmall)
+        Text("Brain Dump", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        Text("Get everything out of your head.", style = MaterialTheme.typography.bodyMedium)
         
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = text,
             onValueChange = { text = it },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("What's on your mind?") },
+            textStyle = MaterialTheme.typography.headlineSmall,
+            placeholder = { Text("What's on your mind?", style = MaterialTheme.typography.headlineSmall) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+            ),
             trailingIcon = {
                 IconButton(onClick = {
                     if (text.isNotBlank()) {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         onAddTask(text)
                         text = ""
                     }
@@ -232,22 +239,26 @@ fun BrainDumpStep(
             }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(tasks) { task ->
                 Surface(
                     modifier = Modifier.padding(vertical = 4.dp),
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant
                 ) {
                     Row(
                         modifier = Modifier
-                            .padding(8.dp)
+                            .padding(12.dp)
                             .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(task.title, modifier = Modifier.weight(1f))
+                        Text(
+                            task.title, 
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                         IconButton(onClick = { onRemoveTask(task) }) {
                             Icon(Icons.Default.Close, contentDescription = "Remove")
                         }
@@ -256,12 +267,16 @@ fun BrainDumpStep(
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = onNext,
             modifier = Modifier.fillMaxWidth(),
-            enabled = tasks.isNotEmpty()
+            enabled = tasks.isNotEmpty(),
+            shape = RoundedCornerShape(12.dp),
+            contentPadding = PaddingValues(16.dp)
         ) {
-            Text("Next: Prioritize")
+            Text("Next: Prioritize", style = MaterialTheme.typography.titleMedium)
         }
     }
 }
