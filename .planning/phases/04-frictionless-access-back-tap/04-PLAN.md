@@ -2,34 +2,29 @@
 
 ---
 phase: 04-frictionless-access-back-tap
-plan: 01
+plan: 00
 type: execute
-wave: 1
+wave: 0
 depends_on: []
-files_modified: [app/src/main/AndroidManifest.xml, app/src/main/res/xml/accessibility_service_config.xml, app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt]
+files_modified: [app/src/androidTest/java/hr/fipu/organizationtool/BackTapTest.kt, app/src/androidTest/java/hr/fipu/organizationtool/OnboardingTest.kt]
 autonomous: true
-requirements: [GEST-01]
+requirements: [GEST-01, GEST-02]
 
 must_haves:
   truths:
-    - "ZenStackAccessibilityService is registered in the system settings"
-    - "Double-tap trigger logic successfully fires a launch intent to MainActivity"
+    - "Integration test skeletons for Back Tap and Onboarding are created in Wave 0"
   artifacts:
-    - path: "app/src/main/res/xml/accessibility_service_config.xml"
-      provides: "Accessibility service configuration"
-    - path: "app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt"
-      provides: "Accessibility Service skeleton and launch logic"
-  key_links:
-    - from: "ZenStackAccessibilityService"
-      to: "MainActivity"
-      via: "Intent(ACTION_VIEW_TASKS)"
+    - path: "app/src/androidTest/java/hr/fipu/organizationtool/BackTapTest.kt"
+      provides: "Back Tap gesture detection test skeleton"
+    - path: "app/src/androidTest/java/hr/fipu/organizationtool/OnboardingTest.kt"
+      provides: "One-time onboarding flow test skeleton"
 ---
 
 <objective>
-Establish the infrastructure for the Back Tap Accessibility Service. This plan creates the service skeleton and registers it in the system to enable background activity launching.
+Create integration test skeletons to ensure TDD-friendly verification of the Back Tap and Onboarding features.
 
-Purpose: Bypassing background launch restrictions (Android 10+) using the privileged Accessibility Service.
-Output: Registered Accessibility Service capable of launching the app.
+Purpose: Establishing verification gates before implementation.
+Output: Test files ready for implementation.
 </objective>
 
 <execution_context>
@@ -37,82 +32,135 @@ Output: Registered Accessibility Service capable of launching the app.
 </execution_context>
 
 <context>
-@.planning/PROJECT.md
-@.planning/ROADMAP.md
-@.planning/phases/04-frictionless-access-back-tap/04-CONTEXT.md
-@.planning/phases/04-frictionless-access-back-tap/04-RESEARCH.md
-@app/src/main/AndroidManifest.xml
-@app/src/main/java/hr/fipu/organizationtool/MainActivity.kt
+@.planning/phases/04-frictionless-access-back-tap/04-VALIDATION.md
 </context>
 
 <tasks>
 
 <task type="auto">
-  <name>Task 1: Create accessibility service configuration</name>
-  <files>app/src/main/res/xml/accessibility_service_config.xml</files>
+  <name>Task 1: Create BackTapTest skeleton</name>
+  <files>app/src/androidTest/java/hr/fipu/organizationtool/BackTapTest.kt</files>
   <action>
-    Create the XML configuration for the accessibility service.
-    - Set `accessibilityEventTypes="typeAllMask"`.
-    - Set `accessibilityFeedbackType="feedbackGeneric"`.
-    - Set `canRetrieveWindowContent="false"` (for privacy/efficiency).
-    - Set `canPerformGestures="true"`.
-    - Reference per-D-01 research: `android:description="@string/accessibility_description"`.
+    Create a skeleton integration test for the Back Tap gesture.
+    - Setup a JUnit 4 test class.
+    - Add a stub test `testDoubleTapLaunchesMainActivity`.
+    - Per GEST-01: The test should eventually verify that the Accessibility Service triggers the correct intent.
   </action>
   <verify>
-    <automated>test -f app/src/main/res/xml/accessibility_service_config.xml</automated>
+    <automated>test -f app/src/androidTest/java/hr/fipu/organizationtool/BackTapTest.kt</automated>
   </verify>
-  <done>XML configuration file created with correct parameters.</done>
+  <done>Test skeleton created.</done>
 </task>
 
 <task type="auto">
-  <name>Task 2: Implement ZenStackAccessibilityService skeleton</name>
-  <files>app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt</files>
+  <name>Task 2: Create OnboardingTest skeleton</name>
+  <files>app/src/androidTest/java/hr/fipu/organizationtool/OnboardingTest.kt</files>
   <action>
-    Create `ZenStackAccessibilityService` extending `AccessibilityService`.
-    - Implement `onAccessibilityEvent` and `onInterrupt` as stubs.
-    - Add `triggerLaunch()` method that builds an intent for `MainActivity.ACTION_VIEW_TASKS`.
-    - Use `Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP`.
-    - Per RESEARCH.md: If API 34+, use `ActivityOptions.setPendingIntentBackgroundActivityStartMode(MODE_BACKGROUND_ACTIVITY_START_ALLOWED)`.
+    Create a skeleton integration test for the Onboarding guide.
+    - Setup a JUnit 4 test class.
+    - Add stub tests: `testOnboardingShowsOnFirstLaunch`, `testOnboardingHiddenAfterCompletion`.
+    - Per GEST-02: The test should eventually verify DataStore persistence and UI visibility.
   </action>
   <verify>
-    <automated>grep -q "ZenStackAccessibilityService" app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt</automated>
+    <automated>test -f app/src/androidTest/java/hr/fipu/organizationtool/OnboardingTest.kt</automated>
   </verify>
-  <done>Service skeleton with launch logic exists.</done>
-</task>
-
-<task type="auto">
-  <name>Task 3: Register service in AndroidManifest.xml</name>
-  <files>app/src/main/AndroidManifest.xml</files>
-  <action>
-    Add the `<service>` declaration to `AndroidManifest.xml`.
-    - Set `android:name=".service.ZenStackAccessibilityService"`.
-    - Set `android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"`.
-    - Include `<intent-filter>` for `android.accessibilityservice.AccessibilityService`.
-    - Add `<meta-data>` pointing to `@xml/accessibility_service_config`.
-  </action>
-  <verify>
-    <automated>grep -q "android.permission.BIND_ACCESSIBILITY_SERVICE" app/src/main/AndroidManifest.xml</automated>
-  </verify>
-  <done>Service registered and visible to the Android system.</done>
-</task>
-
-<task type="checkpoint:human-verify" gate="blocking">
-  <what-built>Registered Accessibility Service Infrastructure</what-built>
-  <how-to-verify>
-    1. Deploy the app to a device/emulator.
-    2. Go to System Settings -> Accessibility -> Downloaded/Installed Services.
-    3. Verify "ZenStack" appears in the list.
-    4. Enable it (no behavior yet, just verify it stays enabled without crashing).
-  </how-to-verify>
-  <resume-signal>Service is visible and enable-able</resume-signal>
+  <done>Test skeleton created.</done>
 </task>
 
 </tasks>
 
 <success_criteria>
-- Accessibility Service is registered in the Manifest.
-- Config file exists.
-- Service is visible in Android system settings.
+- Test files exist in the androidTest directory.
+</success_criteria>
+
+<output>
+After completion, create `.planning/phases/04-frictionless-access-back-tap/04-00-SUMMARY.md`
+</output>
+
+---
+phase: 04-frictionless-access-back-tap
+plan: 01
+type: execute
+wave: 1
+depends_on: [04-00]
+files_modified: [app/src/main/java/hr/fipu/organizationtool/MainActivity.kt, gradle/libs.versions.toml, app/build.gradle.kts, app/src/main/java/hr/fipu/organizationtool/data/OnboardingRepository.kt]
+autonomous: true
+requirements: [GEST-01, GEST-02]
+
+must_haves:
+  truths:
+    - "MainActivity uses ZenStackApp as its primary content"
+    - "MainActivity identifies ACTION_VIEW_TASKS and prepares for navigation"
+    - "OnboardingRepository is ready to persist the guide status"
+  artifacts:
+    - path: "app/src/main/java/hr/fipu/organizationtool/MainActivity.kt"
+      provides: "Entry point with ZenStackApp integration"
+    - path: "app/src/main/java/hr/fipu/organizationtool/data/OnboardingRepository.kt"
+      provides: "DataStore-based persistence for onboarding"
+  key_links:
+    - from: "MainActivity"
+      to: "ZenStackApp"
+      via: "setContent"
+    - from: "ZenStackApp"
+      to: "OnboardingRepository"
+      via: "State check for onboarding guide"
+---
+
+<objective>
+Update the main entry point to use the production UI and establish the persistence layer for the onboarding guide.
+
+Purpose: Fixing the target destination for GEST-01 and preparing GEST-02 infrastructure.
+Output: Updated MainActivity and functional OnboardingRepository.
+</objective>
+
+<execution_context>
+@M:/programs/organizationTool/.gemini/get-shit-done/workflows/execute-plan.md
+</execution_context>
+
+<context>
+@app/src/main/java/hr/fipu/organizationtool/MainActivity.kt
+@.planning/phases/04-frictionless-access-back-tap/04-CONTEXT.md
+@.planning/phases/04-frictionless-access-back-tap/04-RESEARCH.md
+</context>
+
+<tasks>
+
+<task type="auto">
+  <name>Task 1: Update MainActivity to use ZenStackApp and handle ACTION_VIEW_TASKS</name>
+  <files>app/src/main/java/hr/fipu/organizationtool/MainActivity.kt</files>
+  <action>
+    Update `MainActivity.kt`:
+    - Replace `FoundationLab()` with `ZenStackApp()` in `setContent`.
+    - Ensure `ACTION_VIEW_TASKS` is defined in the companion object (per current state).
+    - Handle `ACTION_VIEW_TASKS` intent in `onCreate`. If detected, log and ensure the app is ready to display `CurrentTasksView` (ZenStackApp handles this reactive to data, so loading it is primary).
+  </action>
+  <verify>
+    <automated>grep -q "ZenStackApp()" app/src/main/java/hr/fipu/organizationtool/MainActivity.kt</automated>
+  </verify>
+  <done>MainActivity integrated with production UI and intent constant defined/handled.</done>
+</task>
+
+<task type="auto">
+  <name>Task 2: Setup DataStore and OnboardingRepository</name>
+  <files>gradle/libs.versions.toml, app/build.gradle.kts, app/src/main/java/hr/fipu/organizationtool/data/OnboardingRepository.kt</files>
+  <action>
+    - Add `androidx-datastore-preferences` version `1.1.2` to `libs.versions.toml`.
+    - Add dependency to `app/build.gradle.kts`.
+    - Create `OnboardingRepository.kt` in `hr.fipu.organizationtool.data`.
+    - Use `preferencesDataStore` to track `hasSeenBackTapGuide` (Boolean).
+    - Expose `hasSeenBackTapGuide: Flow<Boolean>` and `suspend fun setHasSeenBackTapGuide(seen: Boolean)`.
+  </action>
+  <verify>
+    <automated>test -f app/src/main/java/hr/fipu/organizationtool/data/OnboardingRepository.kt</automated>
+  </verify>
+  <done>Persistence layer for onboarding state is implemented.</done>
+</task>
+
+</tasks>
+
+<success_criteria>
+- MainActivity launches ZenStackApp.
+- DataStore dependency is present and Repository is created.
 </success_criteria>
 
 <output>
@@ -123,30 +171,36 @@ After completion, create `.planning/phases/04-frictionless-access-back-tap/04-01
 phase: 04-frictionless-access-back-tap
 plan: 02
 type: execute
-wave: 2
-depends_on: [04-01]
-files_modified: [app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt]
+wave: 1
+depends_on: [04-00]
+files_modified: [app/src/main/AndroidManifest.xml, app/src/main/res/xml/accessibility_service_config.xml, app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt]
 autonomous: true
 requirements: [GEST-01]
 
 must_haves:
   truths:
-    - "Physical double-tap on device back triggers app launch"
-    - "Detection does not trigger on single taps or general motion"
+    - "Accessibility Service is registered and visible in system settings"
+    - "Service monitors accelerometer only when screen is ON using DisplayManager"
+    - "Double-tap triggers ACTION_VIEW_TASKS intent to MainActivity"
   artifacts:
+    - path: "app/src/main/res/xml/accessibility_service_config.xml"
+      provides: "Accessibility service metadata"
     - path: "app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt"
-      provides: "Accelerometer processing logic"
+      provides: "Power-optimized gesture detection"
   key_links:
     - from: "ZenStackAccessibilityService"
-      to: "SensorManager"
-      via: "SensorEventListener on Z-axis"
+      to: "MainActivity"
+      via: "Intent(ACTION_VIEW_TASKS)"
+    - from: "ZenStackAccessibilityService"
+      to: "DisplayManager"
+      via: "DisplayListener for screen state"
 ---
 
 <objective>
-Implement the core gesture detection logic using the device accelerometer. This plan transforms the service from a skeleton into an active gesture listener.
+Implement the Accessibility Service with power-optimized gesture detection.
 
-Purpose: Detecting physical "Back Tap" gestures without using private APIs.
-Output: Functional gesture detection that launches the app.
+Purpose: Reliable background app launch via physical gesture (GEST-01).
+Output: Functional, battery-conscious Accessibility Service.
 </objective>
 
 <execution_context>
@@ -155,64 +209,57 @@ Output: Functional gesture detection that launches the app.
 
 <context>
 @.planning/phases/04-frictionless-access-back-tap/04-RESEARCH.md
-@app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt
+@app/src/main/AndroidManifest.xml
 </context>
 
 <tasks>
 
 <task type="auto">
-  <name>Task 1: Implement SensorEventListener for peak detection</name>
-  <files>app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt</files>
+  <name>Task 1: Register Service and Create Configuration</name>
+  <files>app/src/main/AndroidManifest.xml, app/src/main/res/xml/accessibility_service_config.xml</files>
   <action>
-    Implement `SensorEventListener` in `ZenStackAccessibilityService`.
-    - Obtain `SensorManager` and register for `Sensor.TYPE_ACCELEROMETER` with `SENSOR_DELAY_UI`.
-    - In `onSensorChanged`, monitor the Z-axis (`event.values[2]`).
-    - Implement the peak detection algorithm from RESEARCH.md:
-      - `TAP_THRESHOLD` (approx 15.0f).
-      - `WINDOW_START` (150ms debounce).
-      - `WINDOW_END` (500ms max for 2nd tap).
-    - Call `triggerLaunch()` when double-tap detected.
+    - Create `app/src/main/res/xml/accessibility_service_config.xml` with `canPerformGestures="true"` and `feedbackGeneric`.
+    - Add the `<service>` to `AndroidManifest.xml` with `BIND_ACCESSIBILITY_SERVICE` permission and the appropriate intent filter.
   </action>
   <verify>
-    <automated>grep -q "SensorEventListener" app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt</automated>
+    <automated>grep -q "BIND_ACCESSIBILITY_SERVICE" app/src/main/AndroidManifest.xml</automated>
   </verify>
-  <done>Accelerometer data is processed for double-tap patterns.</done>
+  <done>Service infrastructure is registered in the system.</done>
 </task>
 
 <task type="auto">
-  <name>Task 2: Implement power-aware listening</name>
+  <name>Task 2: Implement ZenStackAccessibilityService with DisplayListener</name>
   <files>app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt</files>
   <action>
-    Optimize battery usage per RESEARCH.md recommendations.
-    - Only listen to accelerometer when the screen is ON.
-    - Use `onServiceConnected` and `onUnbind` to manage sensor registration.
-    - Register a `BroadcastReceiver` for `ACTION_SCREEN_ON` and `ACTION_SCREEN_OFF` if necessary, or check `DisplayManager`.
+    Implement `ZenStackAccessibilityService`:
+    - Inherit `AccessibilityService`, `SensorEventListener`, and `DisplayManager.DisplayListener`.
+    - In `onServiceConnected`, register `DisplayListener` with `DisplayManager`.
+    - In `onDisplayChanged`, check `display.state`. If `Display.STATE_ON`, register the `Sensor.TYPE_ACCELEROMETER`. If `STATE_OFF`, unregister it.
+    - Implement the peak detection algorithm (Z-axis, threshold 15.0f, window 150-500ms).
+    - On detection, call `startActivity` with `ACTION_VIEW_TASKS`. Use `FLAG_ACTIVITY_NEW_TASK` and handle API 34+ background start restrictions as per RESEARCH.md.
   </action>
   <verify>
-    <automated>grep -q "onServiceConnected" app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt</automated>
+    <automated>grep -q "DisplayListener" app/src/main/java/hr/fipu/organizationtool/service/ZenStackAccessibilityService.kt</automated>
   </verify>
-  <done>Service listens only when device is active.</done>
+  <done>Gesture detection logic is implemented with battery optimization.</done>
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>Gesture Detection Logic</what-built>
+  <what-built>Accessibility Service & Gesture Detection</what-built>
   <how-to-verify>
-    1. Deploy to a physical device (Emulators may lack back-tap simulation unless using sensor injection).
-    2. Enable "ZenStack" Accessibility Service.
-    3. Exit the app.
-    4. Double-tap the back of the phone firmly.
-    5. Verify ZenStack launches to `CurrentTasksView`.
-    6. Verify single taps or normal shaking do NOT launch the app.
+    1. Deploy to device. Enable ZenStack in Accessibility Settings.
+    2. Exit app. Double-tap the back of the device.
+    3. Verify ZenStack launches to the main screen.
+    4. Verify it doesn't launch when screen is OFF (saving battery).
   </how-to-verify>
-  <resume-signal>Gesture detection works as expected</resume-signal>
+  <resume-signal>Service works and respects screen state</resume-signal>
 </task>
 
 </tasks>
 
 <success_criteria>
-- App launches upon physical double-tap.
-- Low false-positive rate during normal usage.
-- Service is battery-conscious.
+- Service launches the app via double-tap.
+- Sensor is inactive when screen is OFF.
 </success_criteria>
 
 <output>
@@ -223,32 +270,30 @@ After completion, create `.planning/phases/04-frictionless-access-back-tap/04-02
 phase: 04-frictionless-access-back-tap
 plan: 03
 type: execute
-wave: 1
-depends_on: []
-files_modified: [gradle/libs.versions.toml, app/build.gradle.kts, app/src/main/java/hr/fipu/organizationtool/data/OnboardingRepository.kt, app/src/main/java/hr/fipu/organizationtool/ui/ZenStackApp.kt, app/src/main/java/hr/fipu/organizationtool/ui/components/BackTapOnboarding.kt]
+wave: 2
+depends_on: [04-01, 04-02]
+files_modified: [app/src/main/java/hr/fipu/organizationtool/ui/components/BackTapOnboarding.kt, app/src/main/java/hr/fipu/organizationtool/ui/ZenStackApp.kt]
 autonomous: true
 requirements: [GEST-02]
 
 must_haves:
   truths:
-    - "New users see the 'How to enable Back Tap' guide during setup"
-    - "The guide is hidden after completion or on subsequent app launches"
+    - "The one-time onboarding guide is visible during setup"
+    - "The legacy persistent 'How-to' section is removed from CurrentTasksView"
   artifacts:
-    - path: "app/src/main/java/hr/fipu/organizationtool/data/OnboardingRepository.kt"
-      provides: "Persistence for walkthrough status"
     - path: "app/src/main/java/hr/fipu/organizationtool/ui/components/BackTapOnboarding.kt"
-      provides: "Walkthrough UI"
+      provides: "One-time walkthrough UI component"
   key_links:
     - from: "SetupFlow"
-      to: "OnboardingRepository"
-      via: "Boolean check for hasSeenBackTapGuide"
+      to: "BackTapOnboarding"
+      via: "Conditional step integration"
 ---
 
 <objective>
-Implement the one-time onboarding guide for the Back Tap feature. This ensures users know how to activate the accessibility service they just built.
+Implement the one-time onboarding guide and clean up the UI by removing legacy components.
 
-Purpose: Educational onboarding for the gesture feature.
-Output: One-time walkthrough UI integrated into the setup flow.
+Purpose: Fulfilling GEST-02 and ensuring a clean, minimalist UI per CONTEXT.md.
+Output: Integrated onboarding flow and streamlined main UI.
 </objective>
 
 <execution_context>
@@ -256,66 +301,58 @@ Output: One-time walkthrough UI integrated into the setup flow.
 </execution_context>
 
 <context>
-@.planning/phases/04-frictionless-access-back-tap/04-CONTEXT.md
 @app/src/main/java/hr/fipu/organizationtool/ui/ZenStackApp.kt
-@gradle/libs.versions.toml
+@.planning/phases/04-frictionless-access-back-tap/04-CONTEXT.md
 </context>
 
 <tasks>
 
 <task type="auto">
-  <name>Task 1: Setup DataStore and OnboardingRepository</name>
-  <files>gradle/libs.versions.toml, app/build.gradle.kts, app/src/main/java/hr/fipu/organizationtool/data/OnboardingRepository.kt</files>
+  <name>Task 1: Create BackTapOnboarding component</name>
+  <files>app/src/main/java/hr/fipu/organizationtool/ui/components/BackTapOnboarding.kt</files>
   <action>
-    - Add `androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version = "1.1.2" }` to `libs.versions.toml`.
-    - Add dependency to `app/build.gradle.kts`.
-    - Create `OnboardingRepository` using DataStore.
-    - Provide a Flow `hasSeenBackTapGuide: Flow<Boolean>` and a function `markBackTapGuideAsSeen()`.
-    - Register repository in Koin module (if existing) or instantiate in ViewModel.
+    Create a Compose component `BackTapOnboarding` that provides a step-by-step visual guide for enabling the Accessibility Service.
+    - Focus on minimalist design.
+    - Instructions: Go to Settings -> Accessibility -> Downloaded Services -> ZenStack.
+    - Include a "Got it" button that triggers completion.
   </action>
   <verify>
-    <automated>grep -q "datastore-preferences" gradle/libs.versions.toml</automated>
+    <automated>test -f app/src/main/java/hr/fipu/organizationtool/ui/components/BackTapOnboarding.kt</automated>
   </verify>
-  <done>Persistence layer for onboarding state is ready.</done>
+  <done>Onboarding UI component created.</done>
 </task>
 
 <task type="auto">
-  <name>Task 2: Create BackTapOnboarding UI and integrate into SetupFlow</name>
-  <files>app/src/main/java/hr/fipu/organizationtool/ui/components/BackTapOnboarding.kt, app/src/main/java/hr/fipu/organizationtool/ui/ZenStackApp.kt</files>
+  <name>Task 2: Integrate Onboarding and Remove Legacy UI</name>
+  <files>app/src/main/java/hr/fipu/organizationtool/ui/ZenStackApp.kt</files>
   <action>
-    - Create `BackTapOnboarding` component using `HorizontalPager` or simple `Steps` UI.
-    - Content: Instructions for System Settings -> Accessibility -> ZenStack.
-    - Modify `SetupFlow` in `ZenStackApp.kt`:
-      - Fetch `hasSeenBackTapGuide` from repository/viewModel.
-      - Add a 4th step `BackTapOnboardingStep` to `SetupFlow` that appears only if `hasSeenBackTapGuide` is false.
-      - Call `markBackTapGuideAsSeen()` when user confirms or finishes setup.
+    Update `ZenStackApp.kt`:
+    - Integration: Add a step to `SetupFlow` that shows `BackTapOnboarding` if `hasSeenBackTapGuide` is false.
+    - Cleanup: Remove the `showHowTo` variable and the `TextButton` ("How to use Back Tap for quick access?") section from `CurrentTasksView` (per GEST-02 and CONTEXT.md).
+    - Ensure `markBackTapGuideAsSeen()` is called upon completion of the setup flow.
   </action>
   <verify>
-    <automated>grep -q "BackTapOnboarding" app/src/main/java/hr/fipu/organizationtool/ui/ZenStackApp.kt</automated>
+    <automated>grep -v "How to use Back Tap for quick access?" app/src/main/java/hr/fipu/organizationtool/ui/ZenStackApp.kt</automated>
   </verify>
-  <done>Walkthrough is integrated into the setup experience.</done>
+  <done>Onboarding integrated and legacy persistent guide removed.</done>
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>One-Time Onboarding Experience</what-built>
+  <what-built>One-Time Onboarding & UI Cleanup</what-built>
   <how-to-verify>
-    1. Clear App Data.
-    2. Launch ZenStack.
-    3. Complete Brain Dump and Power 3 steps.
-    4. Verify the "Back Tap Guide" appears as the final step.
-    5. Complete setup.
-    6. Restart app or reset session.
-    7. Verify the "Back Tap Guide" does NOT appear again.
+    1. Reset App data. Launch app.
+    2. Verify Onboarding Guide appears during setup.
+    3. Complete setup. Verify "Focus Mode" screen (CurrentTasksView) does NOT have the persistent "How-to" card at the bottom.
+    4. Restart app. Verify onboarding does not reappear.
   </how-to-verify>
-  <resume-signal>Onboarding shows once as expected</resume-signal>
+  <resume-signal>Onboarding is one-time and UI is clean</resume-signal>
 </task>
 
 </tasks>
 
 <success_criteria>
-- DataStore correctly persists walkthrough status.
-- UI guide shows instructions for Back Tap.
-- Guide is strictly one-time.
+- User sees onboarding once.
+- Main UI is free of persistent instructions.
 </success_criteria>
 
 <output>
