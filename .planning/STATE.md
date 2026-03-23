@@ -50,6 +50,9 @@ progress:
 - [Phase 08-01]: MainShell uses outer Scaffold for NavigationBar; CurrentTasksView retains inner Scaffold for FAB — nested Scaffold pattern works correctly
 - [Phase 08-02]: nl.dionsegijn.konfetti.core.PartySystem is the correct class (not models.PartySystem as in plan sample code)
 - [Phase 08-02]: One-shot confetti guard uses remember(task IDs set) to reset per session
+- [Phase 09]: MIGRATION_3_4 uses ALTER TABLE tasks ADD COLUMN completedAt INTEGER DEFAULT NULL — nullable column safe for existing rows
+- [Phase 09]: Both MIGRATION_2_3 and MIGRATION_3_4 registered in databaseBuilder to support upgrades from v2 and v3
+- [Phase 09]: completedAt stamp pattern: newStatus == COMPLETED -> System.currentTimeMillis() else null, applied identically in Repository and widget callback
 
 ### Todos
 
@@ -62,7 +65,7 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-23T22:36:00Z
+2026-03-23T22:36:36.373Z
 
 - Executed Phase 8: Navigation Shell & Confetti (Plans 08-01 and 08-02).
 - Added konfetti-compose 2.0.5 dependency.
