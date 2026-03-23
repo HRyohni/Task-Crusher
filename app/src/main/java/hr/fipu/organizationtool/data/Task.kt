@@ -11,5 +11,6 @@ data class Task(
     val isPriority: Boolean = false,
     val status: String = "TODO",
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = System.currentTimeMillis()
+    val updatedAt: Long = System.currentTimeMillis(),
+    val completedAt: Long? = null
 )
