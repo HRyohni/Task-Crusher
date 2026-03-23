@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">organizationTool</string>
+    <string name="accessibility_service_name">ZenStack Back Tap</string>
+    <string name="accessibility_service_description">Enables double-tap on the back of the device to quickly access your ZenStack focus mode.</string>
 </resources>
