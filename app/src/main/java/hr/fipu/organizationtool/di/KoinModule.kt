@@ -1,6 +1,7 @@
 package hr.fipu.organizationtool.di
 
 import hr.fipu.organizationtool.data.AppDatabase
+import hr.fipu.organizationtool.data.OnboardingRepository
 import hr.fipu.organizationtool.data.TaskRepository
 import hr.fipu.organizationtool.ui.TaskViewModel
 import org.koin.dsl.module
@@ -13,5 +14,6 @@ val appModule = module {
     single { AppDatabase.getDatabase(androidContext()) }
     single { get<AppDatabase>().taskDao() }
     single { TaskRepository(get()) }
+    single { OnboardingRepository(androidContext()) }
     viewModel { TaskViewModel(get(), androidApplication()) }
 }
