@@ -32,8 +32,10 @@
   1. User can type a task in a minimalist "Void Input" and see it saved to the list.
   2. User can select exactly 3 tasks from the pool for their session.
   3. User is prevented from selecting a 4th task, with non-selected items dimming dynamically.
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 3 plans
+- [ ] 02-01-PLAN.md — Refined Brain Dump & Haptic Capture (DUMP-01)
+- [ ] 02-02-PLAN.md — Tactical Selection & Constraints (PRIO-01, PRIO-02, PRIO-03)
+- [ ] 02-03-PLAN.md — Persistent Suggestions & Session State (CORE-02 refinement)
 
 ### Phase 3: Glance Widget Integration
 **Goal**: Bridge the App and Home Screen via a synchronized Glance widget.
@@ -81,7 +83,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Architecture | 0/4 | Not started | - |
-| 2. The Core Loop | 0/1 | Not started | - |
+| 2. The Core Loop | 0/3 | Not started | - |
 | 3. Glance Widget Integration | 0/1 | Not started | - |
 | 4. Frictionless Access (Back Tap) | 0/1 | Not started | - |
 | 5. Tactile Interaction | 0/1 | Not started | - |
