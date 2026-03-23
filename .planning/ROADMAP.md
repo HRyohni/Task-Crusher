@@ -145,7 +145,10 @@
   3. Completing all 3 priorities within 1 hour of session start registers a "Speed Run" achievement.
   4. Unlocking a new achievement shows a pop-up notification at the moment it is earned.
   5. The Achievements tab lists every achievement (locked and unlocked) with a progress indicator for each.
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 11-01-PLAN.md — Data layer: AchievementEntity, AchievementDao, DB v4→v5 migration (ACH-01..03 persistence)
+- [ ] 11-02-PLAN.md — ViewModel logic: streak calc, speed run detection, achievement checking, unlock state (ACH-01, ACH-02, ACH-03, ACH-04)
+- [ ] 11-03-PLAN.md — AchievementsScreen gallery + unlock overlay in ZenStackApp (ACH-04, ACH-05)
 
 ## Progress Table
 
@@ -161,4 +164,4 @@
 | 8. Navigation Shell & Confetti | 0/2 | Not started | - |
 | 9. Scrollable Widget & Completion History | 0/2 | Not started | - |
 | 10. Calendar Tab | 0/? | Not started | - |
-| 11. Achievements Tab | 0/? | Not started | - |
+| 11. Achievements Tab | 0/3 | Not started | - |
