@@ -20,11 +20,11 @@ progress:
 
 ## Current Position
 
-**Phase:** Phase 7 (not started)
-**Plan:** —
-**Status:** Roadmap defined — awaiting phase planning
+**Phase:** Phase 8 (complete)
+**Plan:** 08-02 (complete)
+**Status:** Phase 8 complete — ready for Phase 9
 
-[----------] 0%
+[████------] 40%
 
 ## Performance Metrics
 
@@ -46,6 +46,10 @@ progress:
 - [Phase 07]: Widget uses TaskRepository pattern with SQL LIMIT-bounded queries, never AppDatabase directly
 - [Phase 07]: hasSeenBackTapGuide initial value false is correct semantic for fresh-install guard; true was a bug
 - [Phase 07]: Deep-link to Settings.ACTION_ACCESSIBILITY_SETTINGS with FLAG_ACTIVITY_NEW_TASK for onboarding UX
+- [Phase 08-01]: Used Icons.Default.Home for Today tab (authorized substitution for Icons.Default.Today per plan)
+- [Phase 08-01]: MainShell uses outer Scaffold for NavigationBar; CurrentTasksView retains inner Scaffold for FAB — nested Scaffold pattern works correctly
+- [Phase 08-02]: nl.dionsegijn.konfetti.core.PartySystem is the correct class (not models.PartySystem as in plan sample code)
+- [Phase 08-02]: One-shot confetti guard uses remember(task IDs set) to reset per session
 
 ### Todos
 
@@ -58,11 +62,13 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-23T22:07:43.217Z
+2026-03-23T22:36:00Z
 
-- Started milestone v1.1 Engagement — defined 21 requirements across BUG, PERF, UX, NAV, WIDG, CAL, ACH categories.
-- Created roadmap Phases 7-11 with 100% requirement coverage.
+- Executed Phase 8: Navigation Shell & Confetti (Plans 08-01 and 08-02).
+- Added konfetti-compose 2.0.5 dependency.
+- Added MainShell bottom NavigationBar with Today/Calendar/Achievements tabs.
+- Added full-screen confetti celebration overlay (one-shot, session-resettable).
 
 **Next Steps:**
 
-- Run `/gsd:plan-phase 7` to create execution plans for Stability & Quick Wins.
+- Run `/gsd:execute-phase 9` for Widget + History / CAL-03 timestamp recording.
