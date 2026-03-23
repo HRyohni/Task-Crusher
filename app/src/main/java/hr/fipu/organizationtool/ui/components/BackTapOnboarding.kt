@@ -29,7 +29,7 @@ fun BackTapOnboarding(onGotIt: () -> Unit) {
                 imageVector = Icons.Default.Settings,
                 contentDescription = null,
                 modifier = Modifier.size(64.dp),
-                color = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary
             )
             
             Spacer(modifier = Modifier.height(24.dp))

@@ -28,6 +28,9 @@ import hr.fipu.organizationtool.ui.theme.ZenGrayDark
 import hr.fipu.organizationtool.ui.theme.ZenIndigo
 import hr.fipu.organizationtool.ui.theme.ZenSurface
 
+import androidx.glance.appwidget.appWidgetBackgroundRadius
+import android.content.Intent
+
 class ZenStackWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val dao = AppDatabase.getDatabase(context).taskDao()
@@ -39,13 +42,18 @@ class ZenStackWidget : GlanceAppWidget() {
             val completedCount = priorityTasks.count { it.status == "COMPLETED" }
             val progress = completedCount.toFloat() / priorityTasks.size.coerceAtLeast(1)
 
+            val clickIntent = Intent(context, MainActivity::class.java).apply {
+                action = MainActivity.ACTION_VIEW_TASKS
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
             Column(
                 modifier = GlanceModifier
                     .fillMaxSize()
                     .background(ColorProvider(ZenSurface))
-                    .cornerRadius(12.dp)
+                    .appWidgetBackgroundRadius()
                     .padding(12.dp)
-                    .clickable(actionStartActivity<MainActivity>(action = MainActivity.ACTION_VIEW_TASKS))
+                    .clickable(actionStartActivity(clickIntent))
             ) {
                 Row(
                     modifier = GlanceModifier.fillMaxWidth(),
