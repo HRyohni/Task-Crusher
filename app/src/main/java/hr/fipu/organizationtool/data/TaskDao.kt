@@ -14,6 +14,9 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE isPriority = 1")
     fun getPriorityTasks(): Flow<List<Task>>
 
+    @Query("SELECT * FROM tasks WHERE status != 'COMPLETED' AND (isPriority = 1 OR status = 'TODO') ORDER BY createdAt DESC")
+    fun getSuggestedTasks(): Flow<List<Task>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: Task)
 
@@ -25,4 +28,7 @@ interface TaskDao {
 
     @Query("DELETE FROM tasks")
     suspend fun deleteAllTasks()
+
+    @Query("UPDATE tasks SET isPriority = 0")
+    suspend fun clearAllPriorities()
 }

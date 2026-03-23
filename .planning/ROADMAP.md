@@ -5,7 +5,7 @@
 - [ ] **Phase 1: Foundation & Data Architecture** - Establish the Kotlin 2.1/M3 foundation and Room Single Source of Truth.
 - [ ] **Phase 2: The Core Loop (Brain Dump & Prioritization)** - Implement rapid task capture and the "Power 3" selection logic.
 - [ ] **Phase 3: Glance Widget Integration** - Connect the Room DB to an interactive home screen widget with sync loop.
-- [ ] **Phase 4: Frictionless Access (Back Tap)** - Implement Accessibility Service for double-tap launch and onboarding.
+- [x] **Phase 4: Frictionless Access (Back Tap)** - Implement Accessibility Service for double-tap launch and onboarding. (completed 2026-03-23)
 - [ ] **Phase 5: Tactile Interaction (Advanced UI)** - Add spring-based animations and interactive "bubbles" to the dump.
 - [ ] **Phase 6: Sensory Feedback & Polish** - Implement low-latency audio rewards and final refinements.
 
@@ -88,6 +88,6 @@
 | 1. Foundation & Data Architecture | 0/4 | Not started | - |
 | 2. The Core Loop | 0/3 | Not started | - |
 | 3. Glance Widget Integration | 0/1 | Not started | - |
-| 4. Frictionless Access (Back Tap) | 0/3 | Not started | - |
+| 4. Frictionless Access (Back Tap) | 1/1 | Complete   | 2026-03-23 |
 | 5. Tactile Interaction | 0/1 | Not started | - |
 | 6. Sensory Feedback & Polish | 0/1 | Not started | - |

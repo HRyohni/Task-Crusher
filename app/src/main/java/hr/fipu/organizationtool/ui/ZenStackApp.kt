@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import hr.fipu.organizationtool.data.Task
 import hr.fipu.organizationtool.ui.theme.zenShadow
 import hr.fipu.organizationtool.ui.theme.zenSpring
+import hr.fipu.organizationtool.ui.components.BackTapOnboarding
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
@@ -62,7 +63,9 @@ fun ZenStackApp(viewModel: TaskViewModel = koinViewModel()) {
 fun SetupFlow(viewModel: TaskViewModel, onFinished: () -> Unit) {
     var currentStep by remember { mutableStateOf(1) }
     val tasks by viewModel.brainDumpTasks.collectAsState()
+    val suggestedTasks by viewModel.suggestedTasks.collectAsState()
     val selectedPriorityIds by viewModel.selectedPriorityIds.collectAsState()
+    val hasSeenBackTapGuide by viewModel.hasSeenBackTapGuide.collectAsState()
 
     Scaffold { padding ->
         Column(
@@ -71,17 +74,21 @@ fun SetupFlow(viewModel: TaskViewModel, onFinished: () -> Unit) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text(
-                text = "ZenStack Setup",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            if (currentStep < 4) {
+                Text(
+                    text = "ZenStack Setup",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             when (currentStep) {
                 1 -> BrainDumpStep(
                     tasks = tasks,
+                    suggestedTasks = suggestedTasks,
                     onAddTask = { viewModel.addTask(it) },
+                    onAddSuggestedTask = { viewModel.addSuggestedTask(it) },
                     onRemoveTask = { viewModel.removeTask(it) },
                     onNext = { if (tasks.isNotEmpty()) currentStep = 2 }
                 )
@@ -97,9 +104,19 @@ fun SetupFlow(viewModel: TaskViewModel, onFinished: () -> Unit) {
                     selectedIds = selectedPriorityIds,
                     onConfirm = {
                         viewModel.saveSession()
-                        onFinished()
+                        if (hasSeenBackTapGuide) {
+                            onFinished()
+                        } else {
+                            currentStep = 4
+                        }
                     },
                     onBack = { currentStep = 2 }
+                )
+                4 -> BackTapOnboarding(
+                    onGotIt = {
+                        viewModel.markBackTapGuideAsSeen()
+                        onFinished()
+                    }
                 )
             }
         }
@@ -115,7 +132,6 @@ fun CurrentTasksView(
     val haptic = LocalHapticFeedback.current
     val priorityTasks = tasks.filter { it.isPriority }
     val otherTasks = tasks.filter { !it.isPriority }
-    var showHowTo by remember { mutableStateOf(false) }
 
     Scaffold(
         floatingActionButton = {
@@ -158,27 +174,6 @@ fun CurrentTasksView(
                     }
                 }
             }
-
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-                TextButton(onClick = { showHowTo = !showHowTo }) {
-                    Text("How to use Back Tap for quick access?")
-                }
-                AnimatedVisibility(visible = showHowTo) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text("1. Open System Settings", fontWeight = FontWeight.Bold)
-                            Text("2. Search for 'Quick Tap' or 'Back Tap'")
-                            Text("3. Select 'Open App'")
-                            Text("4. Choose 'ZenStack'")
-                            Text("Now double-tap your phone's back to focus instantly!")
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -211,7 +206,9 @@ fun TaskCard(task: Task, isPriority: Boolean, onClick: () -> Unit) {
 @Composable
 fun BrainDumpStep(
     tasks: List<Task>,
+    suggestedTasks: List<Task>,
     onAddTask: (String) -> Unit,
+    onAddSuggestedTask: (Task) -> Unit,
     onRemoveTask: (Task) -> Unit,
     onNext: () -> Unit
 ) {
@@ -248,6 +245,29 @@ fun BrainDumpStep(
         )
 
         Spacer(modifier = Modifier.height(24.dp))
+
+        // Suggested Tasks
+        val filteredSuggestions = suggestedTasks.filter { sugg -> tasks.none { it.id == sugg.id } }
+        if (filteredSuggestions.isNotEmpty()) {
+            Text("Suggested for you", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(8.dp))
+            androidx.compose.foundation.lazy.LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(horizontal = 4.dp)
+            ) {
+                items(filteredSuggestions) { task ->
+                    SuggestionChip(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onAddSuggestedTask(task)
+                        },
+                        label = { Text(task.title) },
+                        icon = { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(tasks) { task ->

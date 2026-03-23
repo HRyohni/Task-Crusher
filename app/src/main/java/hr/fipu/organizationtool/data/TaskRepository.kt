@@ -8,6 +8,8 @@ class TaskRepository(private val taskDao: TaskDao) {
     
     val priorityTasks: Flow<List<Task>> = taskDao.getPriorityTasks()
     
+    val suggestedTasks: Flow<List<Task>> = taskDao.getSuggestedTasks()
+    
     suspend fun insertTask(task: Task) {
         taskDao.insertTask(task.copy(updatedAt = System.currentTimeMillis()))
     }
@@ -22,6 +24,10 @@ class TaskRepository(private val taskDao: TaskDao) {
     
     suspend fun deleteAllTasks() {
         taskDao.deleteAllTasks()
+    }
+    
+    suspend fun clearAllPriorities() {
+        taskDao.clearAllPriorities()
     }
     
     suspend fun toggleTaskCompletion(task: Task) {

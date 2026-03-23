@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hr.fipu.organizationtool.data.OnboardingRepository
 import hr.fipu.organizationtool.data.Task
 import hr.fipu.organizationtool.data.TaskRepository
 import hr.fipu.organizationtool.widget.ZenStackWidget
@@ -16,11 +17,18 @@ import kotlinx.coroutines.launch
 
 class TaskViewModel(
     private val repository: TaskRepository,
+    private val onboardingRepository: OnboardingRepository,
     private val application: Application
 ) : ViewModel() {
 
     val savedTasks: StateFlow<List<Task>?> = repository.allTasks
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val suggestedTasks: StateFlow<List<Task>> = repository.suggestedTasks
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val hasSeenBackTapGuide: StateFlow<Boolean> = onboardingRepository.hasSeenBackTapGuide
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     private val _brainDumpTasks = MutableStateFlow<List<Task>>(emptyList())
     val brainDumpTasks: StateFlow<List<Task>> = _brainDumpTasks.asStateFlow()
@@ -28,12 +36,18 @@ class TaskViewModel(
     private val _selectedPriorityIds = MutableStateFlow<Set<Int>>(emptySet())
     val selectedPriorityIds: StateFlow<Set<Int>> = _selectedPriorityIds.asStateFlow()
 
-    private var nextId = 1
+    private var nextTempId = -1
 
     fun addTask(title: String) {
         if (title.isBlank()) return
-        val newTask = Task(id = nextId++, title = title)
+        val newTask = Task(id = nextTempId--, title = title)
         _brainDumpTasks.value = listOf(newTask) + _brainDumpTasks.value
+    }
+
+    fun addSuggestedTask(task: Task) {
+        if (_brainDumpTasks.value.none { it.id == task.id }) {
+            _brainDumpTasks.value = listOf(task) + _brainDumpTasks.value
+        }
     }
 
     fun removeTask(task: Task) {
@@ -48,23 +62,31 @@ class TaskViewModel(
         } else if (currentSelected.size < 3) {
             _selectedPriorityIds.value = currentSelected + task.id
         }
-        // If currentSelected.size >= 3 and !contains(task.id), we do nothing.
-        // The UI (Power3Step) handles the warning and haptic feedback.
     }
 
     fun toggleTaskCompletion(task: Task) {
         viewModelScope.launch {
-            val nextStatus = if (task.status == "COMPLETED") "TODO" else "COMPLETED"
-            repository.updateTask(task.copy(status = nextStatus))
+            repository.toggleTaskCompletion(task)
             ZenStackWidget().updateAll(application)
+        }
+    }
+
+    fun markBackTapGuideAsSeen() {
+        viewModelScope.launch {
+            onboardingRepository.setHasSeenBackTapGuide(true)
         }
     }
 
     fun saveSession() {
         viewModelScope.launch {
-            repository.deleteAllTasks()
+            repository.clearAllPriorities()
             val finalTasks = _brainDumpTasks.value.map { task ->
-                task.copy(id = 0, isPriority = _selectedPriorityIds.value.contains(task.id))
+                val isPriority = _selectedPriorityIds.value.contains(task.id)
+                if (task.id < 0) {
+                    task.copy(id = 0, isPriority = isPriority)
+                } else {
+                    task.copy(isPriority = isPriority)
+                }
             }
             finalTasks.forEach { repository.insertTask(it) }
             ZenStackWidget().updateAll(application)

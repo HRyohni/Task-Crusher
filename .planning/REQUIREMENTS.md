@@ -7,7 +7,7 @@
 - [ ] **CORE-02**: Room KMP Repository as Single Source of Truth for tasks and session state.
 
 ### DUMP: The Brain Dump
-- [ ] **DUMP-01**: "Void Input" - Minimalist, full-screen text entry for rapid task capture.
+- [x] **DUMP-01**: "Void Input" - Minimalist, full-screen text entry for rapid task capture.
 - [ ] **DUMP-02**: "Tactile Tags" - Visual representation of tasks as bubbles with spring-based motion (`AnchoredDraggable`).
 - [ ] **DUMP-03**: Interaction Layer - Tap to edit, 'X' to delete tags in real-time.
 
@@ -22,8 +22,8 @@
 - [ ] **WIDG-03**: Success Audio - `SoundPool` implementation for low-latency "ding" on task completion.
 
 ### GEST: Frictionless Access
-- [ ] **GEST-01**: Back Tap Gesture - Accessibility Service or Shortcut to launch ZenStack via double-tap.
-- [ ] **GEST-02**: Onboarding Guide - In-app visual "How-To" for system-level gesture mapping.
+- [x] **GEST-01**: Back Tap Gesture - Accessibility Service or Shortcut to launch ZenStack via double-tap.
+- [x] **GEST-02**: Onboarding Guide - In-app visual "How-To" for system-level gesture mapping.
 
 ## v2 Requirements (Deferred)
 - [ ] Cloud Sync & Multi-device Support
@@ -41,7 +41,7 @@
 |-------------|-------|--------|
 | CORE-01 | Phase 1 | Pending |
 | CORE-02 | Phase 1 | Pending |
-| DUMP-01 | Phase 2 | Pending |
+| DUMP-01 | Phase 2 | Complete |
 | DUMP-02 | Phase 5 | Pending |
 | DUMP-03 | Phase 5 | Pending |
 | PRIO-01 | Phase 2 | Pending |
@@ -50,5 +50,5 @@
 | WIDG-01 | Phase 3 | Pending |
 | WIDG-02 | Phase 3 | Pending |
 | WIDG-03 | Phase 6 | Pending |
-| GEST-01 | Phase 4 | Pending |
-| GEST-02 | Phase 4 | Pending |
+| GEST-01 | Phase 4 | Complete |
+| GEST-02 | Phase 4 | Complete |
