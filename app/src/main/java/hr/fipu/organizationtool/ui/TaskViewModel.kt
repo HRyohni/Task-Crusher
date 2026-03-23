@@ -90,6 +90,8 @@ class TaskViewModel(
             }
             finalTasks.forEach { repository.insertTask(it) }
             ZenStackWidget().updateAll(application)
+            _brainDumpTasks.value = emptyList()
+            _selectedPriorityIds.value = emptySet()
         }
     }
 }
