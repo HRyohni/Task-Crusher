@@ -28,7 +28,7 @@ class TaskViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val hasSeenBackTapGuide: StateFlow<Boolean> = onboardingRepository.hasSeenBackTapGuide
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val _brainDumpTasks = MutableStateFlow<List<Task>>(emptyList())
     val brainDumpTasks: StateFlow<List<Task>> = _brainDumpTasks.asStateFlow()
