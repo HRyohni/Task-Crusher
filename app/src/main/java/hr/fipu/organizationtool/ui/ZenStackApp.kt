@@ -1,6 +1,10 @@
 package hr.fipu.organizationtool.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -22,6 +27,9 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import hr.fipu.organizationtool.data.Task
+import hr.fipu.organizationtool.ui.theme.zenShadow
+import hr.fipu.organizationtool.ui.theme.zenSpring
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -289,47 +297,112 @@ fun Power3Step(
     onNext: () -> Unit,
     onBack: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text("Step 2: The Power 3", style = MaterialTheme.typography.titleMedium)
-        Text("Select your 3 most important tasks.", style = MaterialTheme.typography.bodySmall)
-        
-        Spacer(modifier = Modifier.height(16.dp))
+    val haptic = LocalHapticFeedback.current
+    var showWarning by remember { mutableStateOf(false) }
 
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(tasks) { task ->
-                val isSelected = selectedIds.contains(task.id)
-                val isDimmed = selectedIds.size >= 3 && !isSelected
+    // Logic to show warning and double-vibrate if 4th item attempted
+    val handleToggle: (Task) -> Unit = { task ->
+        if (selectedIds.size >= 3 && !selectedIds.contains(task.id)) {
+            showWarning = true
+            // Double vibration effect
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            // Note: In a real app we'd use a Coroutine for the second tap after delay
+            // But for this UI component we'll handle the visual warning here
+        } else {
+            onTogglePriority(task)
+        }
+    }
 
-                Surface(
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .clickable { onTogglePriority(task) }
-                        .alpha(if (isDimmed) 0.5f else 1f),
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer 
-                            else MaterialTheme.colorScheme.surfaceVariant
-                ) {
-                    Text(
-                        task.title,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        style = MaterialTheme.typography.bodyLarge
+    // Effect to hide warning after 2 seconds
+    LaunchedEffect(showWarning) {
+        if (showWarning) {
+            // Trigger second vibration for "double-vibration" effect
+            delay(100)
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            
+            delay(2000)
+            showWarning = false
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Text("Step 2: The Power 3", style = MaterialTheme.typography.titleMedium)
+            Text("Select your 3 most important tasks.", style = MaterialTheme.typography.bodySmall)
+            
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                items(tasks, key = { it.id }) { task ->
+                    val isSelected = selectedIds.contains(task.id)
+                    val isDimmed = selectedIds.size >= 3 && !isSelected
+
+                    // Pop motion animation
+                    val scale by animateFloatAsState(
+                        targetValue = if (isSelected) 1.05f else 1f,
+                        animationSpec = zenSpring(),
+                        label = "PopScale"
                     )
+
+                    Surface(
+                        modifier = Modifier
+                            .padding(vertical = 6.dp, horizontal = 4.dp)
+                            .scale(scale)
+                            .zenShadow(
+                                elevation = if (isSelected) 8.dp else 0.dp,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .clickable { handleToggle(task) }
+                            .alpha(if (isDimmed) 0.5f else 1f),
+                        shape = RoundedCornerShape(12.dp),
+                        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer 
+                                else MaterialTheme.colorScheme.surfaceVariant
+                    ) {
+                        Text(
+                            task.title,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) {
+                    Text("Back")
+                }
+                Button(
+                    onClick = onNext,
+                    modifier = Modifier.weight(1f),
+                    enabled = selectedIds.isNotEmpty()
+                ) {
+                    Text("Next: Summary")
                 }
             }
         }
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) {
-                Text("Back")
-            }
-            Button(
-                onClick = onNext,
-                modifier = Modifier.weight(1f),
-                enabled = selectedIds.isNotEmpty()
+        // Pill Warning Popup
+        AnimatedVisibility(
+            visible = showWarning,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 80.dp)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                modifier = Modifier.zenShadow(4.dp, RoundedCornerShape(24.dp))
             ) {
-                Text("Next: Summary")
+                Text(
+                    "Select only 3 priorities.",
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
         }
     }
