@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import hr.fipu.organizationtool.ui.FoundationLab
+import hr.fipu.organizationtool.ui.ZenStackApp
 import hr.fipu.organizationtool.ui.theme.ZenTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ZenTheme {
-                FoundationLab()
+                ZenStackApp()
             }
         }
     }
