@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Engagement
-status: Roadmap defined
-last_updated: "2026-03-23T00:00:00.000Z"
+status: Phase 11 complete
+last_updated: "2026-03-23T23:30:00.000Z"
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 5
   total_plans: 0
   completed_plans: 0
 ---
@@ -16,15 +16,15 @@ progress:
 ## Project Reference
 
 **Core Value:** Focus through Frictionless Intent: Minimize the gap between a thought and its capture, then force a choice to prevent paralysis.
-**Current Focus:** Milestone v1.1 — Engagement. Roadmap defined (Phases 7-11). Ready to plan Phase 7.
+**Current Focus:** Milestone v1.1 — Engagement complete. All 5 phases (7-11) executed.
 
 ## Current Position
 
-**Phase:** Phase 8 (complete)
-**Plan:** 08-02 (complete)
-**Status:** Phase 8 complete — ready for Phase 9
+**Phase:** Phase 11 (complete)
+**Plan:** 11-03 (complete)
+**Status:** Phase 11 complete — Milestone v1.1 Engagement fully implemented
 
-[████------] 40%
+[██████████] 100%
 
 ## Performance Metrics
 
@@ -32,6 +32,12 @@ progress:
 - **Phase Velocity:** 0 phases / week
 - **Plan Velocity:** 0 plans / week
 - **Technical Debt Score:** 0 (Baseline)
+
+| Phase | Plan | Duration (min) | Tasks | Files |
+|-------|------|----------------|-------|-------|
+| 11 | 01 | 8 | 2 | 4 |
+| 11 | 02 | 10 | 2 | 2 |
+| 11 | 03 | 12 | 2 | 2 |
 
 ## Accumulated Context
 
@@ -57,6 +63,9 @@ progress:
 - [Phase 09]: Glance LazyColumn replaces Column+forEach for scrollable widget; widget-wide clickable removed (conflicts with scroll); individual row clicks preserved
 - [Phase 10-calendar-tab]: Use .first() instead of .collect{return@collect} for loadCompletionHistory() snapshot reads — Room Flows never terminate so .collect{} would suspend indefinitely
 - [Phase 10-calendar-tab]: CalendarScreen state collected at ZenStackApp level and threaded into MainShell as parameters — keeps composable tree stateless below ZenStackApp
+- [Phase 11]: KoinModule viewModel line stays at 3 args in 11-01 and is updated to 4 args in 11-02 when TaskViewModel constructor is updated — plans must be sequenced
+- [Phase 11]: Achievement domain data class lives in TaskViewModel.kt (UI package) not data layer — it is a UI domain model backed by AchievementEntity persistence
+- [Phase 11]: LaunchedEffect(newlyUnlockedAchievement) key change re-arms 4s auto-dismiss timer on each new unlock; Box wrapper in ZenStackApp allows banner to float above all content
 
 ### Todos
 
@@ -69,13 +78,14 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-23T22:50:12.927Z
+2026-03-23T23:30:00.000Z
 
-- Executed Phase 8: Navigation Shell & Confetti (Plans 08-01 and 08-02).
-- Added konfetti-compose 2.0.5 dependency.
-- Added MainShell bottom NavigationBar with Today/Calendar/Achievements tabs.
-- Added full-screen confetti celebration overlay (one-shot, session-resettable).
+- Executed Phase 11: Achievements Tab (Plans 11-01, 11-02, 11-03).
+- Created AchievementEntity + AchievementDao, DB migrated v4 to v5.
+- Added full achievement logic to TaskViewModel: 8 achievement definitions, streak calculation, speed-run detection, volume milestones, newlyUnlockedAchievement + achievements StateFlows.
+- Built AchievementsScreen gallery (8 cards, locked/unlocked states, progress bars) and AchievementUnlockBanner overlay (slide-in from top, 4s auto-dismiss, tap-to-dismiss).
+- Milestone v1.1 Engagement is now fully complete.
 
 **Next Steps:**
 
-- Run `/gsd:execute-phase 9` for Widget + History / CAL-03 timestamp recording.
+- Milestone v1.1 complete. Consider planning v1.2 or a release candidate.
