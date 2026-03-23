@@ -8,6 +8,8 @@ class TaskRepository(private val taskDao: TaskDao) {
     
     val priorityTasks: Flow<List<Task>> = taskDao.getPriorityTasks()
 
+    val allNonPriorityTasks: Flow<List<Task>> = taskDao.getNonPriorityTasks(Int.MAX_VALUE)
+
     fun getNonPriorityTasks(limit: Int): Flow<List<Task>> = taskDao.getNonPriorityTasks(limit)
 
     val suggestedTasks: Flow<List<Task>> = taskDao.getSuggestedTasks()
