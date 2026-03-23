@@ -48,6 +48,8 @@ class TaskViewModel(
         } else if (currentSelected.size < 3) {
             _selectedPriorityIds.value = currentSelected + task.id
         }
+        // If currentSelected.size >= 3 and !contains(task.id), we do nothing.
+        // The UI (Power3Step) handles the warning and haptic feedback.
     }
 
     fun toggleTaskCompletion(task: Task) {
