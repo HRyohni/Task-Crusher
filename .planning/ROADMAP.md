@@ -121,7 +121,9 @@
   1. The widget is scrollable and shows all priority tasks without a hard cap.
   2. Brain dump (non-priority) tasks appear in a scrollable section below the priorities on the widget.
   3. Completing a task records a timestamp that can be queried to retrieve all tasks finished on a given day.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 09-01-PLAN.md — Completion timestamp data layer: Task.completedAt, DB v4 migration, DAO calendar query, Repository + widget callback update (CAL-03)
+- [ ] 09-02-PLAN.md — Scrollable widget with LazyColumn showing all priority and brain dump tasks (WIDG-04, WIDG-05)
 
 ### Phase 10: Calendar Tab
 **Goal**: Users can review their completion history at a glance and drill into any past day.
@@ -157,6 +159,6 @@
 | 6. Sensory Feedback & Polish | 0/1 | Not started | - |
 | 7. Stability & Quick Wins | 0/3 | Not started | - |
 | 8. Navigation Shell & Confetti | 0/2 | Not started | - |
-| 9. Scrollable Widget & Completion History | 0/? | Not started | - |
+| 9. Scrollable Widget & Completion History | 0/2 | Not started | - |
 | 10. Calendar Tab | 0/? | Not started | - |
 | 11. Achievements Tab | 0/? | Not started | - |
