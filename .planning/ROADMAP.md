@@ -96,7 +96,10 @@
   3. Running a session multiple times does not duplicate previously-suggested tasks in the database.
   4. Battery usage by the accelerometer sensor is measurably reduced (SENSOR_DELAY_NORMAL).
   5. User can tap a button on the back-tap setup screen and land directly on the Android Accessibility Settings page.
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 07-01-PLAN.md — Data integrity fixes (Room migration, exportSchema, saveSession reset)
+- [ ] 07-02-PLAN.md — Performance fixes (SENSOR_DELAY_NORMAL, widget repository pattern)
+- [ ] 07-03-PLAN.md — Onboarding fix + accessibility deep-link button
 
 ### Phase 8: Navigation Shell & Confetti
 **Goal**: Users can navigate between app sections via a persistent bottom bar, and completing all 3 priorities delivers a satisfying confetti reward.
@@ -150,7 +153,7 @@
 | 4. Frictionless Access (Back Tap) | 1/1 | Complete   | 2026-03-23 |
 | 5. Tactile Interaction | 0/1 | Not started | - |
 | 6. Sensory Feedback & Polish | 0/1 | Not started | - |
-| 7. Stability & Quick Wins | 0/? | Not started | - |
+| 7. Stability & Quick Wins | 0/3 | Not started | - |
 | 8. Navigation Shell & Confetti | 0/? | Not started | - |
 | 9. Scrollable Widget & Completion History | 0/? | Not started | - |
 | 10. Calendar Tab | 0/? | Not started | - |
