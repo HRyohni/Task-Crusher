@@ -43,6 +43,7 @@ import nl.dionsegijn.konfetti.core.PartySystem
 import nl.dionsegijn.konfetti.core.Position
 import nl.dionsegijn.konfetti.core.emitter.Emitter
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
 enum class MainTab { TODAY, CALENDAR, ACHIEVEMENTS }
@@ -60,13 +61,21 @@ fun ZenStackApp(viewModel: TaskViewModel = koinViewModel()) {
         }
     }
 
+    val completionHistory by viewModel.completionHistory.collectAsState()
+    val selectedDay by viewModel.selectedDay.collectAsState()
+    val tasksForSelectedDay by viewModel.tasksForSelectedDay.collectAsState()
+
     if (showSetup || savedTasks == null) {
         SetupFlow(viewModel) { showSetup = false }
     } else {
         MainShell(
             tasks = savedTasks!!,
             onRestart = { showSetup = true },
-            onToggleComplete = { task -> viewModel.toggleTaskCompletion(task) }
+            onToggleComplete = { task -> viewModel.toggleTaskCompletion(task) },
+            completionHistory = completionHistory,
+            selectedDay = selectedDay,
+            tasksForSelectedDay = tasksForSelectedDay,
+            onDaySelected = { date -> viewModel.selectDay(date) }
         )
     }
 }
@@ -75,7 +84,11 @@ fun ZenStackApp(viewModel: TaskViewModel = koinViewModel()) {
 fun MainShell(
     tasks: List<Task>,
     onRestart: () -> Unit,
-    onToggleComplete: (Task) -> Unit
+    onToggleComplete: (Task) -> Unit,
+    completionHistory: Map<LocalDate, Int>,
+    selectedDay: LocalDate?,
+    tasksForSelectedDay: List<Task>,
+    onDaySelected: (LocalDate) -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(MainTab.TODAY) }
 
@@ -110,17 +123,16 @@ fun MainShell(
                     onRestart = onRestart,
                     onToggleComplete = onToggleComplete
                 )
-                MainTab.CALENDAR -> CalendarPlaceholder()
+                MainTab.CALENDAR -> CalendarScreen(
+                    completionHistory = completionHistory,
+                    selectedDay = selectedDay,
+                    tasksForSelectedDay = tasksForSelectedDay,
+                    onDaySelected = onDaySelected,
+                    modifier = Modifier.fillMaxSize()
+                )
                 MainTab.ACHIEVEMENTS -> AchievementsPlaceholder()
             }
         }
-    }
-}
-
-@Composable
-fun CalendarPlaceholder() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Calendar — coming soon", style = MaterialTheme.typography.bodyLarge)
     }
 }
 
