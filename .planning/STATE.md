@@ -75,10 +75,16 @@ progress:
 
 - None.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Replace naive Z-threshold back-tap detector with TapTap heuristic signal-processing algorithm | 2026-03-24 | 7b2292f | [1-replace-naive-z-threshold-back-tap-detec](./quick/1-replace-naive-z-threshold-back-tap-detec/) |
+
 ## Session Continuity
 
 **Last Session:**
-2026-03-23T23:30:00.000Z
+2026-03-24
 
 - Executed Phase 11: Achievements Tab (Plans 11-01, 11-02, 11-03).
 - Created AchievementEntity + AchievementDao, DB migrated v4 to v5.
