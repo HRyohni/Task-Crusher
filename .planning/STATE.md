@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Engagement
 status: Phase 11 complete
-last_updated: "2026-03-23T23:30:00.000Z"
+last_updated: "2026-03-24T00:00:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 5
@@ -80,6 +80,7 @@ progress:
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 1 | Replace naive Z-threshold back-tap detector with TapTap heuristic signal-processing algorithm | 2026-03-24 | 7b2292f | [1-replace-naive-z-threshold-back-tap-detec](./quick/1-replace-naive-z-threshold-back-tap-detec/) |
+| 2 | Widget corner radius, hide completed brain dump tasks, calendar screen fit fix | 2026-03-24 | — | [2-widget-corner-radius-hide-completed-brai](./quick/2-widget-corner-radius-hide-completed-brai/) |
 
 ## Session Continuity
 
