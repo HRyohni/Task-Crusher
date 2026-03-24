@@ -80,7 +80,7 @@ progress:
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 1 | Replace naive Z-threshold back-tap detector with TapTap heuristic signal-processing algorithm | 2026-03-24 | 7b2292f | [1-replace-naive-z-threshold-back-tap-detec](./quick/1-replace-naive-z-threshold-back-tap-detec/) |
-| 2 | Widget corner radius, hide completed brain dump tasks, calendar screen fit fix | 2026-03-24 | — | [2-widget-corner-radius-hide-completed-brai](./quick/2-widget-corner-radius-hide-completed-brai/) |
+| 2 | Widget corner radius, hide completed brain dump tasks, calendar screen fit fix | 2026-03-24 | 7dd0306 | [2-widget-corner-radius-hide-completed-brai](./quick/2-widget-corner-radius-hide-completed-brai/) |
 
 ## Session Continuity
 
