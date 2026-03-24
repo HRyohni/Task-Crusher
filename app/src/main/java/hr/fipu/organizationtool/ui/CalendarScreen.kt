@@ -3,12 +3,9 @@ package hr.fipu.organizationtool.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -45,7 +42,7 @@ fun CalendarScreen(
     // Monday=1..Sunday=7, padding to align Monday to column 0
     val paddingCellCount = firstDate.dayOfWeek.value % 7
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
         // Header
         Text(
             text = "Activity",
@@ -78,25 +75,31 @@ fun CalendarScreen(
         val nullPadding = List<LocalDate?>(paddingCellCount) { null }
         val dateCells: List<LocalDate?> = nullPadding + dates
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(7),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp)
-                .heightIn(max = 300.dp)
-        ) {
-            items(dateCells) { date ->
-                if (date == null) {
-                    Box(modifier = Modifier.size(32.dp))
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .padding(2.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(heatmapColor(completionHistory[date] ?: 0))
-                            .clickable { onDaySelected(date) }
-                    )
+        // Non-lazy grid — avoids nested scroll conflict with the outer verticalScroll Column.
+        // The cell count is bounded (max 96 cells for 90 days + up to 6 padding cells).
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
+            dateCells.chunked(7).forEach { week ->
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    week.forEach { date ->
+                        Box(modifier = Modifier.weight(1f)) {
+                            if (date == null) {
+                                Box(modifier = Modifier.size(32.dp))
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .padding(2.dp)
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(heatmapColor(completionHistory[date] ?: 0))
+                                        .clickable { onDaySelected(date) }
+                                )
+                            }
+                        }
+                    }
+                    // Fill remaining cells in last row if week is not full
+                    repeat(7 - week.size) {
+                        Box(modifier = Modifier.weight(1f).size(32.dp))
+                    }
                 }
             }
         }
@@ -118,9 +121,7 @@ fun CalendarScreen(
 
         // Day detail panel
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
+            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             when {
@@ -139,10 +140,8 @@ fun CalendarScreen(
                     )
                 }
                 else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(tasksForSelectedDay) { task ->
+                    Column {
+                        tasksForSelectedDay.forEach { task ->
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
                                 color = MaterialTheme.colorScheme.surfaceVariant,
