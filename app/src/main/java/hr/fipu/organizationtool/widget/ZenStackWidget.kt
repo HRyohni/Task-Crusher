@@ -14,6 +14,7 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.LinearProgressIndicator
 import androidx.glance.appwidget.action.actionRunCallback
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
@@ -40,7 +41,9 @@ class ZenStackWidget : GlanceAppWidget() {
             val completedCount = priorityTasks.count { it.status == "COMPLETED" }
             val progress = completedCount.toFloat() / priorityTasks.size.coerceAtLeast(1)
 
-            LazyColumn(modifier = GlanceModifier.fillMaxSize().background(ColorProvider(ZenSurface)).padding(12.dp)) {
+            val activeBrainDumpTasks = otherTasks.filter { it.status != "COMPLETED" }
+
+            LazyColumn(modifier = GlanceModifier.fillMaxSize().background(ColorProvider(ZenSurface)).padding(12.dp).cornerRadius(16.dp)) {
                 // Header row: app name + completion count
                 item {
                     Row(
@@ -79,8 +82,8 @@ class ZenStackWidget : GlanceAppWidget() {
                 items(priorityTasks) { task ->
                     TaskItem(task)
                 }
-                // Brain dump section header (only shown when non-priority tasks exist)
-                if (otherTasks.isNotEmpty()) {
+                // Brain dump section header (only shown when active non-priority tasks exist)
+                if (activeBrainDumpTasks.isNotEmpty()) {
                     item {
                         Text(
                             text = "Brain Dump",
@@ -88,8 +91,8 @@ class ZenStackWidget : GlanceAppWidget() {
                             modifier = GlanceModifier.padding(top = 12.dp, bottom = 4.dp)
                         )
                     }
-                    // Brain dump task rows — no cap, all tasks
-                    items(otherTasks) { task ->
+                    // Brain dump task rows — active (non-completed) only
+                    items(activeBrainDumpTasks) { task ->
                         TaskItem(task, isSmall = true)
                     }
                 }
