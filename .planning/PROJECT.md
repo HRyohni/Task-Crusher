@@ -5,6 +5,24 @@ A minimalist Android productivity app that guides users through a focused "brain
 ## Core Value
 **Focus through Frictionless Intent:** Minimize the gap between a thought and its capture, then force a choice to prevent paralysis.
 
+## Current Milestone: v1.2 Polish & Power
+
+**Goal:** Polish the UX with sounds, smarter task management, widget enhancements, and expanded notifications/achievements.
+
+**Target features:**
+- Sound effect on task completion (SoundPool)
+- Press Enter to add brain dump task
+- Delete undone tasks
+- Persist brain dump session if app closed mid-setup
+- Home tab shows only today's completed tasks (not past days)
+- Fix calendar screen UI
+- Widget: labeled Priority and Brain Dump sections
+- Widget: priority tasks visually larger and highlighted
+- Widget: celebration banner when all 3 priorities done
+- Widget: double tap to open app
+- Push notification on achievement unlock
+- More achievements
+
 ## Context
 ZenStack addresses "choice paralysis" by guiding users through a session that resets their focus. The Home Screen widget (now scrollable, showing all tasks) and Back Tap gesture (deep-link to accessibility settings) are the primary interaction points. v1.1 added engagement loops: confetti, calendar history, and achievements.
 
@@ -47,13 +65,23 @@ ZenStack addresses "choice paralysis" by guiding users through a session that re
 - [ ] **PRIO-03**: Visual Dimming — non-selected items dim when limit reached
 - [ ] **WIDG-02**: Widget Action Loop — check off tasks from home screen, sync to Room
 - [ ] **WIDG-03**: Success Audio — SoundPool low-latency "ding" on task completion
+- [ ] **WIDG-06**: Widget divided into labeled Priority and Brain Dump sections
+- [ ] **WIDG-07**: Priority tasks visually larger and highlighted in widget
+- [ ] **WIDG-08**: Widget celebration banner when all 3 priorities complete
+- [ ] **WIDG-09**: Double tap widget to launch app
+- [ ] **UX-03**: Press Enter/Return key to add task in brain dump
+- [ ] **UX-04**: Calendar screen redesigned for better visual clarity
+- [ ] **UX-05**: Home tab shows only today's completed tasks (not from past days)
+- [ ] **TASK-01**: User can delete incomplete (undone) tasks
+- [ ] **TASK-02**: Brain dump tasks persist if app is closed mid-session
+- [ ] **NOTF-01**: Push notification sent on achievement unlock
+- [ ] **ACH-06**: Additional achievements (beyond existing 8)
 
 ### Out of Scope
 - Cloud Sync — MVP is local-only for privacy/speed
 - Multiple Lists — one focus session at a time
 - Recurring Tasks — focus is on immediate "now" tasks
 - Non-Android Platforms — platform-native focus
-- System Notifications for achievements — in-app overlay is sufficient
 
 ## Key Decisions
 
@@ -68,7 +96,7 @@ ZenStack addresses "choice paralysis" by guiding users through a session that re
 | **Konfetti** | `nl.dionsegijn:konfetti-compose 2.0.5` for confetti | ✓ Good |
 | **Achievements storage** | Room table `achievements(id, unlockedAt)` with IGNORE conflict | ✓ Good — idempotent |
 | **Calendar** | Pure Compose `LazyVerticalGrid`, no external library | ✓ Good |
-| **In-app only notifications** | AnimatedVisibility banner, no system permissions needed | ✓ Good |
+| **Push notifications** | Add system POST_NOTIFICATIONS for achievement unlocks — user requested in v1.2 | — Pending |
 
 ## Constraints
 
@@ -77,4 +105,4 @@ ZenStack addresses "choice paralysis" by guiding users through a session that re
 - **Dependencies:** Minimal — prefer Compose primitives over external libraries
 
 ---
-*Last updated: 2026-03-24 after v1.1 Engagement milestone*
+*Last updated: 2026-03-25 after v1.2 Polish & Power milestone started*
