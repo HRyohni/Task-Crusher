@@ -60,27 +60,27 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WIDG-03 | — | Pending |
-| WIDG-06 | — | Pending |
-| WIDG-07 | — | Pending |
-| WIDG-08 | — | Pending |
-| WIDG-09 | — | Pending |
-| UX-03 | — | Pending |
-| UX-04 | — | Pending |
-| UX-05 | — | Pending |
-| TASK-01 | — | Pending |
-| TASK-02 | — | Pending |
-| NOTF-01 | — | Pending |
-| ACH-06 | — | Pending |
-| ACH-07 | — | Pending |
-| ACH-08 | — | Pending |
-| ACH-09 | — | Pending |
+| WIDG-03 | Phase 14 | Pending |
+| WIDG-06 | Phase 13 | Pending |
+| WIDG-07 | Phase 13 | Pending |
+| WIDG-08 | Phase 13 | Pending |
+| WIDG-09 | Phase 13 | Pending |
+| UX-03 | Phase 12 | Pending |
+| UX-04 | Phase 15 | Pending |
+| UX-05 | Phase 12 | Pending |
+| TASK-01 | Phase 12 | Pending |
+| TASK-02 | Phase 14 | Pending |
+| NOTF-01 | Phase 16 | Pending |
+| ACH-06 | Phase 17 | Pending |
+| ACH-07 | Phase 17 | Pending |
+| ACH-08 | Phase 17 | Pending |
+| ACH-09 | Phase 17 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 15 total
-- Mapped to phases: 0
-- Unmapped: 15 ⚠️
+- Mapped to phases: 15
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-25*
-*Last updated: 2026-03-25 after initial definition*
+*Last updated: 2026-03-25 after roadmap creation (Phases 12–17)*
