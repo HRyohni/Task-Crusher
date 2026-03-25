@@ -23,6 +23,9 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import android.content.Context
+import android.media.AudioManager
+import android.media.ToneGenerator
+import kotlinx.coroutines.delay
 import org.json.JSONArray
 
 data class Achievement(
@@ -107,6 +110,21 @@ class TaskViewModel(
 
     private val draftPrefs by lazy {
         application.getSharedPreferences("zen_draft", Context.MODE_PRIVATE)
+    }
+
+    private val audioManager by lazy {
+        application.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    }
+
+    private fun playDingIfAppropriate() {
+        val ringer = audioManager.ringerMode
+        if (ringer == AudioManager.RINGER_MODE_SILENT || ringer == AudioManager.RINGER_MODE_VIBRATE) return
+        viewModelScope.launch {
+            val tg = ToneGenerator(AudioManager.STREAM_MUSIC, 60)
+            tg.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
+            delay(200L)
+            tg.release()
+        }
     }
 
     private fun saveDraftTasks() {
@@ -263,8 +281,10 @@ class TaskViewModel(
     }
 
     fun toggleTaskCompletion(task: Task) {
+        val isCompletingNow = task.status != "COMPLETED"
         viewModelScope.launch {
             repository.toggleTaskCompletion(task)
+            if (isCompletingNow) playDingIfAppropriate()
             ZenStackWidget().updateAll(application)
             val allTasks = repository.allTasks.first()
             checkAndUnlockAchievements(allTasks)
