@@ -161,8 +161,8 @@
   2. Home tab shows only tasks completed today — tasks from previous days are not visible.
   3. User can delete an incomplete task from the Today view and it is removed immediately.
 **Plans**: 2 plans
-- [ ] 12-01-PLAN.md � Enter key submission in brain dump TextField (UX-03)
-- [ ] 12-02-PLAN.md � Today-only completed task filter and delete incomplete tasks (UX-05, TASK-01)
+- [ ] 12-01-PLAN.md — Enter key submission in brain dump TextField (UX-03)
+- [ ] 12-02-PLAN.md — Today-only completed task filter and delete incomplete tasks (UX-05, TASK-01)
 
 ### Phase 13: Widget Overhaul
 **Goal**: The home screen widget is visually restructured to clearly distinguish priorities from brain dump tasks, celebrate completion, and launch the app on tap.
@@ -173,7 +173,9 @@
   2. Priority task rows are visually larger and use a highlighted style compared to brain dump rows.
   3. When all 3 priority tasks are done, the widget shows a static celebration banner in place of the task list.
   4. Tapping the widget (anywhere outside interactive rows) opens the ZenStack app.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 13-01-PLAN.md — Priority row highlight background and section label polish (WIDG-06, WIDG-07)
+- [ ] 13-02-PLAN.md — Celebration banner and tap-to-open header (WIDG-08, WIDG-09)
 
 ### Phase 14: Brain Dump Persistence & Sound
 **Goal**: Users never lose brain dump work to accidental app closure, and completing tasks is satisfying to hear.
@@ -234,7 +236,7 @@ Phases execute in numeric order: 12 → 13 → 14 → 15 → 16 → 17
 | 10. Calendar Heatmap | v1.1 | 1/1 | Complete | 2026-03-24 |
 | 11. Achievements System | v1.1 | 3/3 | Complete | 2026-03-24 |
 | 12. UX Quick Wins | v1.2 | 0/2 | Not started | - |
-| 13. Widget Overhaul | v1.2 | 0/TBD | Not started | - |
+| 13. Widget Overhaul | v1.2 | 0/2 | Not started | - |
 | 14. Brain Dump Persistence & Sound | v1.2 | 0/TBD | Not started | - |
 | 15. Calendar Redesign | v1.2 | 0/TBD | Not started | - |
 | 16. Push Notifications | v1.2 | 0/TBD | Not started | - |
