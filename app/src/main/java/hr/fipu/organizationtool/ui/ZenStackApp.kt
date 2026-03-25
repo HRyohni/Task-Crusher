@@ -31,7 +31,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import hr.fipu.organizationtool.data.Task
 import hr.fipu.organizationtool.ui.theme.zenShadow
@@ -396,6 +399,14 @@ fun BrainDumpStep(
     var text by remember { mutableStateOf("") }
     val haptic = LocalHapticFeedback.current
 
+    val submitTask: () -> Unit = {
+        if (text.isNotBlank()) {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onAddTask(text)
+            text = ""
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         Text("Brain Dump", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Text("Get everything out of your head.", style = MaterialTheme.typography.bodyMedium)
@@ -412,14 +423,10 @@ fun BrainDumpStep(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
             ),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { submitTask() }),
             trailingIcon = {
-                IconButton(onClick = {
-                    if (text.isNotBlank()) {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        onAddTask(text)
-                        text = ""
-                    }
-                }) {
+                IconButton(onClick = { submitTask() }) {
                     Icon(Icons.Default.Add, contentDescription = "Add")
                 }
             }
