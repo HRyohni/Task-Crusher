@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Polish & Power
-status: Roadmap defined
-last_updated: "2026-03-25T00:00:00.000Z"
+status: In Progress
+last_updated: "2026-03-25T00:15:00.000Z"
 progress:
   total_phases: 6
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
 ---
 
 # Project State: ZenStack
@@ -20,12 +20,12 @@ progress:
 
 ## Current Position
 
-**Phase:** 12 of 17 (UX Quick Wins) — not started
-**Plan:** —
-**Status:** Ready to plan Phase 12
-**Last activity:** 2026-03-25 — v1.2 roadmap created (Phases 12–17, 15 requirements mapped)
+**Phase:** 12 of 17 (UX Quick Wins) — complete
+**Plan:** 02 of 02 (complete)
+**Status:** Phase 12 complete. Ready to plan Phase 13.
+**Last activity:** 2026-03-25 — Phase 12 UX Quick Wins executed (2 plans, 3 tasks, 3 files)
 
-[░░░░░░░░░░] 0%
+[█░░░░░░░░░] 17%
 
 ## Performance Metrics
 
@@ -39,6 +39,8 @@ progress:
 | 11 | 01 | 8 | 2 | 4 |
 | 11 | 02 | 10 | 2 | 2 |
 | 11 | 03 | 12 | 2 | 2 |
+| 12 | 01 | 5 | 1 | 1 |
+| 12 | 02 | 10 | 2 | 2 |
 
 ## Accumulated Context
 
@@ -48,10 +50,13 @@ progress:
 - (2026-03-25) **v1.2 Roadmap**: 6 phases (12-17). Phase 16 (Push Notifications) depends on Phase 11 not Phase 15, since notification sending is triggered by achievement unlock — placing it after the achievement foundation makes more sense than after calendar redesign. Phase 17 (New Achievements) depends on Phase 16 so new unlocks also trigger push notifications.
 - [Phase 11]: Achievement domain data class lives in TaskViewModel.kt (UI package) not data layer — it is a UI domain model backed by AchievementEntity persistence.
 - [Phase 11]: LaunchedEffect(newlyUnlockedAchievement) key change re-arms 4s auto-dismiss timer on each new unlock.
+- [Phase 12]: Extract submitTask lambda pattern for shared keyboard/button submit in Compose TextFields.
+- [Phase 12]: Today-only completed task filter uses local extension function Task.completedToday() scoped inside CurrentTasksView composable.
+- [Phase 12]: TaskCard onDelete is nullable ((() -> Unit)?) so existing usages compile unchanged; delete icon only shown on incomplete tasks.
 
 ### Todos
 
-- [ ] Plan Phase 12: UX Quick Wins
+- [ ] Plan Phase 13: Widget Overhaul
 
 ### Blockers
 
@@ -69,9 +74,10 @@ progress:
 **Last Session:**
 2026-03-25
 
-- Created v1.2 roadmap: 6 phases (12–17), 15 requirements mapped (100% coverage).
-- Phases: 12 UX Quick Wins, 13 Widget Overhaul, 14 Brain Dump Persistence & Sound, 15 Calendar Redesign, 16 Push Notifications, 17 New Achievements.
+- Executed Phase 12 UX Quick Wins (Plans 01 and 02).
+- Plan 01: BrainDumpStep Enter/Done keyboard submit via ImeAction.Done + shared submitTask lambda.
+- Plan 02: Today view filters prior-day completed tasks; incomplete tasks get red delete icon; deleteTask added to ViewModel.
 
 **Next Steps:**
 
-- Run `/gsd:plan-phase 12` to plan UX Quick Wins.
+- Run `/gsd:plan-phase 13` to plan Widget Overhaul.
