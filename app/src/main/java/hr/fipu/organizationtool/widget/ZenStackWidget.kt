@@ -45,6 +45,7 @@ class ZenStackWidget : GlanceAppWidget() {
             val progress = completedCount.toFloat() / priorityTasks.size.coerceAtLeast(1)
 
             val activeBrainDumpTasks = otherTasks.filter { it.status != "COMPLETED" }
+            val isAllComplete = priorityTasks.isNotEmpty() && completedCount == priorityTasks.size
 
             LazyColumn(modifier = GlanceModifier.fillMaxSize().background(ColorProvider(ZenSurface)).padding(12.dp).cornerRadius(16.dp)) {
                 // Header row: app name + completion count
@@ -73,6 +74,30 @@ class ZenStackWidget : GlanceAppWidget() {
                         color = ColorProvider(ZenIndigo),
                         backgroundColor = ColorProvider(Color.LightGray.copy(alpha = 0.2f))
                     )
+                }
+                // Celebration banner — shown only when all 3 priorities are complete
+                if (isAllComplete) {
+                    item {
+                        Row(
+                            modifier = GlanceModifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .background(ColorProvider(ZenIndigo.copy(alpha = 0.12f)))
+                                .cornerRadius(10.dp)
+                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "All done! Great work.",
+                                style = TextStyle(
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = ColorProvider(ZenIndigo)
+                                )
+                            )
+                        }
+                    }
                 }
                 // Priority section header
                 item {
