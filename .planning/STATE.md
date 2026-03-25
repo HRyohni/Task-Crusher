@@ -20,10 +20,10 @@ progress:
 
 ## Current Position
 
-**Phase:** 15 of 17 (Calendar Redesign) — complete
+**Phase:** 16 of 17 (Push Notifications) — complete
 **Plan:** 01 of 01 (complete)
-**Status:** Phase 15 complete. Ready to plan Phase 16.
-**Last activity:** 2026-03-25 — Phase 15 Calendar Screen Redesign verified and complete (1 plan, 2 tasks, 1 file)
+**Status:** Phase 16 complete. Ready to plan Phase 17.
+**Last activity:** 2026-03-25 — Phase 16 Push Notifications complete (1 plan, 2 tasks, 5 files)
 
 [█░░░░░░░░░] 17%
 
@@ -46,6 +46,7 @@ progress:
 | 14 | 01 | 1 | 2 | 1 |
 | 14 | 02 | 2 | 2 | 1 |
 | 15 | 01 | ~5 | 2 | 1 |
+| 16 | 01 | ~10 | 2 | 5 |
 
 ## Accumulated Context
 
@@ -65,10 +66,11 @@ progress:
 - [Phase 14]: isCompletingNow captured before coroutine in toggleTaskCompletion from UI-snapshot task parameter to ensure correct toggle direction
 - [Phase 14]: ToneGenerator used instead of SoundPool for task completion ding — no .ogg/.wav asset required; programmatically generates TONE_PROP_BEEP
 - [Phase 15]: weight(1f).aspectRatio(1f) cell pattern for proportional Compose heatmap grid — eliminates fixed-size overflow on all screen widths
+- [Phase 16]: sendAchievementNotification in TaskViewModel uses constructor-injected application field (plain ViewModel, not AndroidViewModel) — not getApplication()
 
 ### Todos
 
-- [ ] Plan Phase 16: Push Notifications
+- [ ] Plan Phase 17: New Achievements
 
 ### Blockers
 
@@ -84,11 +86,11 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-25T12:00:00Z
+2026-03-25T13:00:00Z
 
-- Phase 15 Calendar Screen Redesign verified complete (human approved visual checkpoint).
-- Plan 01: Six visual fixes to CalendarScreen.kt — proportional cells (weight+aspectRatio), titleLarge header, today indicator border, legend row, conditional divider, left-aligned detail panel.
+- Phase 16 Push Notifications complete and committed (38b7a5f).
+- Plan 01: POST_NOTIFICATIONS permission, singleTop launch mode, notification channel in ZenStackApplication, sendAchievementNotification in TaskViewModel, permission request + deep-link wiring in MainActivity, initialTab param in ZenStackApp/MainShell.
 
 **Next Steps:**
 
-- Run `/gsd:plan-phase 16` to plan Push Notifications phase.
+- Run `/gsd:plan-phase 17` to plan New Achievements phase.
