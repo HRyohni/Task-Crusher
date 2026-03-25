@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
+import android.content.Context
+import org.json.JSONArray
 
 data class Achievement(
     val id: String,
@@ -102,6 +104,27 @@ class TaskViewModel(
     val achievements: StateFlow<List<Achievement>> = _achievements.asStateFlow()
 
     private var nextTempId = -1
+
+    private val draftPrefs by lazy {
+        application.getSharedPreferences("zen_draft", Context.MODE_PRIVATE)
+    }
+
+    private fun saveDraftTasks() {
+        val array = JSONArray()
+        _brainDumpTasks.value.forEach { array.put(it.title) }
+        draftPrefs.edit().putString("draft_tasks", array.toString()).apply()
+    }
+
+    private fun loadDraftTasks() {
+        val raw = draftPrefs.getString("draft_tasks", null) ?: return
+        val array = JSONArray(raw)
+        val tasks = (0 until array.length()).map { i ->
+            Task(id = nextTempId--, title = array.getString(i))
+        }
+        if (tasks.isNotEmpty()) {
+            _brainDumpTasks.value = tasks
+        }
+    }
 
     private fun calculateStreak(tasks: List<Task>): Int {
         val zoneId = ZoneId.systemDefault()
@@ -214,17 +237,20 @@ class TaskViewModel(
         if (title.isBlank()) return
         val newTask = Task(id = nextTempId--, title = title)
         _brainDumpTasks.value = listOf(newTask) + _brainDumpTasks.value
+        saveDraftTasks()
     }
 
     fun addSuggestedTask(task: Task) {
         if (_brainDumpTasks.value.none { it.id == task.id }) {
             _brainDumpTasks.value = listOf(task) + _brainDumpTasks.value
+            saveDraftTasks()
         }
     }
 
     fun removeTask(task: Task) {
         _brainDumpTasks.value = _brainDumpTasks.value - task
         _selectedPriorityIds.value = _selectedPriorityIds.value - task.id
+        saveDraftTasks()
     }
 
     fun togglePriority(task: Task) {
@@ -279,6 +305,7 @@ class TaskViewModel(
     }
 
     init {
+        loadDraftTasks()
         loadCompletionHistory()
         viewModelScope.launch {
             val allTasks = repository.allTasks.first()
@@ -302,6 +329,7 @@ class TaskViewModel(
             ZenStackWidget().updateAll(application)
             _brainDumpTasks.value = emptyList()
             _selectedPriorityIds.value = emptySet()
+            draftPrefs.edit().remove("draft_tasks").apply()
         }
     }
 }
