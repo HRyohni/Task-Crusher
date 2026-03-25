@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Polish & Power
 status: In Progress
-last_updated: "2026-03-25T00:15:00.000Z"
+last_updated: "2026-03-25T12:00:00.000Z"
 progress:
   total_phases: 6
   completed_phases: 1
@@ -20,10 +20,10 @@ progress:
 
 ## Current Position
 
-**Phase:** 15 of 17 (Calendar Redesign) — in progress
+**Phase:** 15 of 17 (Calendar Redesign) — complete
 **Plan:** 01 of 01 (complete)
-**Status:** Phase 15 Plan 01 complete. Awaiting human visual verification.
-**Last activity:** 2026-03-25 — Phase 15 Calendar Screen Redesign executed (1 plan, 2 tasks, 1 file)
+**Status:** Phase 15 complete. Ready to plan Phase 16.
+**Last activity:** 2026-03-25 — Phase 15 Calendar Screen Redesign verified and complete (1 plan, 2 tasks, 1 file)
 
 [█░░░░░░░░░] 17%
 
@@ -45,7 +45,7 @@ progress:
 | Phase 13 P02 | 3 | 2 tasks | 1 files |
 | 14 | 01 | 1 | 2 | 1 |
 | 14 | 02 | 2 | 2 | 1 |
-| 15 | 01 | 5 | 2 | 1 |
+| 15 | 01 | ~5 | 2 | 1 |
 
 ## Accumulated Context
 
@@ -64,10 +64,11 @@ progress:
 - [Phase 14]: org.json.JSONArray used for brain dump title serialization — part of Android SDK, no new Gradle dependency
 - [Phase 14]: isCompletingNow captured before coroutine in toggleTaskCompletion from UI-snapshot task parameter to ensure correct toggle direction
 - [Phase 14]: ToneGenerator used instead of SoundPool for task completion ding — no .ogg/.wav asset required; programmatically generates TONE_PROP_BEEP
+- [Phase 15]: weight(1f).aspectRatio(1f) cell pattern for proportional Compose heatmap grid — eliminates fixed-size overflow on all screen widths
 
 ### Todos
 
-- [ ] Plan Phase 13: Widget Overhaul
+- [ ] Plan Phase 16: Push Notifications
 
 ### Blockers
 
@@ -83,12 +84,11 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-25T00:00:00Z
+2026-03-25T12:00:00Z
 
-- Executed Phase 15 Calendar Screen Redesign (Plan 01).
+- Phase 15 Calendar Screen Redesign verified complete (human approved visual checkpoint).
 - Plan 01: Six visual fixes to CalendarScreen.kt — proportional cells (weight+aspectRatio), titleLarge header, today indicator border, legend row, conditional divider, left-aligned detail panel.
 
 **Next Steps:**
 
-- Visual verification of redesigned CalendarScreen on device/emulator.
-- Run `/gsd:plan-phase 16` to plan next phase after verification.
+- Run `/gsd:plan-phase 16` to plan Push Notifications phase.
