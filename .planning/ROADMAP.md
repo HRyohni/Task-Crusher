@@ -160,7 +160,9 @@
   1. User can press Enter/Return in the brain dump text field to submit a new task without tapping the button.
   2. Home tab shows only tasks completed today — tasks from previous days are not visible.
   3. User can delete an incomplete task from the Today view and it is removed immediately.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 12-01-PLAN.md � Enter key submission in brain dump TextField (UX-03)
+- [ ] 12-02-PLAN.md � Today-only completed task filter and delete incomplete tasks (UX-05, TASK-01)
 
 ### Phase 13: Widget Overhaul
 **Goal**: The home screen widget is visually restructured to clearly distinguish priorities from brain dump tasks, celebrate completion, and launch the app on tap.
@@ -231,7 +233,7 @@ Phases execute in numeric order: 12 → 13 → 14 → 15 → 16 → 17
 | 9. Scrollable Widget & Completion History | v1.1 | 2/2 | Complete | 2026-03-24 |
 | 10. Calendar Heatmap | v1.1 | 1/1 | Complete | 2026-03-24 |
 | 11. Achievements System | v1.1 | 3/3 | Complete | 2026-03-24 |
-| 12. UX Quick Wins | v1.2 | 0/TBD | Not started | - |
+| 12. UX Quick Wins | v1.2 | 0/2 | Not started | - |
 | 13. Widget Overhaul | v1.2 | 0/TBD | Not started | - |
 | 14. Brain Dump Persistence & Sound | v1.2 | 0/TBD | Not started | - |
 | 15. Calendar Redesign | v1.2 | 0/TBD | Not started | - |
