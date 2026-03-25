@@ -221,7 +221,9 @@
   3. "Night Owl" unlocks when the user completes all 3 priorities after 9pm on any day.
   4. "Comeback Kid" unlocks when the user returns after a 7+ day gap and completes a full session.
   5. All 4 new achievements appear in the Achievements tab with correct locked/unlocked state and progress indicators.
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 17-01-PLAN.md — Add 4 behavioral achievements (Perfect Week, Early Bird, Night Owl, Comeback Kid) to TaskViewModel.kt
 
 ## Progress
 
