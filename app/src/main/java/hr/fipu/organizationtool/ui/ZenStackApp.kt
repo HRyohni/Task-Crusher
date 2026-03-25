@@ -57,7 +57,7 @@ import java.util.concurrent.TimeUnit
 enum class MainTab { TODAY, CALENDAR, ACHIEVEMENTS }
 
 @Composable
-fun ZenStackApp(viewModel: TaskViewModel = koinViewModel()) {
+fun ZenStackApp(viewModel: TaskViewModel = koinViewModel(), openAchievementsTab: Boolean = false) {
     val savedTasks by viewModel.savedTasks.collectAsState()
 
     var showSetup by remember { mutableStateOf(false) }
@@ -95,7 +95,8 @@ fun ZenStackApp(viewModel: TaskViewModel = koinViewModel()) {
                 selectedDay = selectedDay,
                 tasksForSelectedDay = tasksForSelectedDay,
                 onDaySelected = { date -> viewModel.selectDay(date) },
-                achievements = achievements
+                achievements = achievements,
+                initialTab = if (openAchievementsTab) MainTab.ACHIEVEMENTS else MainTab.TODAY
             )
         }
 
@@ -127,9 +128,10 @@ fun MainShell(
     selectedDay: LocalDate?,
     tasksForSelectedDay: List<Task>,
     onDaySelected: (LocalDate) -> Unit,
-    achievements: List<Achievement>
+    achievements: List<Achievement>,
+    initialTab: MainTab = MainTab.TODAY
 ) {
-    var selectedTab by remember { mutableStateOf(MainTab.TODAY) }
+    var selectedTab by remember { mutableStateOf(initialTab) }
 
     Scaffold(
         bottomBar = {

@@ -1,9 +1,18 @@
 package hr.fipu.organizationtool.ui
 
+import android.Manifest
 import android.app.Application
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hr.fipu.organizationtool.MainActivity
 import hr.fipu.organizationtool.data.AchievementDao
 import hr.fipu.organizationtool.data.AchievementEntity
 import hr.fipu.organizationtool.data.OnboardingRepository
@@ -243,7 +252,35 @@ class TaskViewModel(
             // Signal UI overlay (only the first newly unlocked this check cycle)
             if (firstNew != null) {
                 _newlyUnlockedAchievement.value = firstNew
+                sendAchievementNotification(firstNew)
             }
+        }
+    }
+
+    private fun sendAchievementNotification(achievement: Achievement) {
+        val context = application
+        val intent = Intent(context, MainActivity::class.java).apply {
+            action = MainActivity.ACTION_OPEN_ACHIEVEMENTS
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val notification = NotificationCompat.Builder(context, "achievement_unlocked")
+            .setSmallIcon(android.R.drawable.star_on)
+            .setContentTitle("Achievement Unlocked!")
+            .setContentText(achievement.title)
+            .setStyle(NotificationCompat.BigTextStyle().bigText("${achievement.title}: ${achievement.description}"))
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .build()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED) {
+            NotificationManagerCompat.from(context).notify(achievement.id.hashCode(), notification)
         }
     }
 
