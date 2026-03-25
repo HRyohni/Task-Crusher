@@ -103,13 +103,26 @@ class ZenStackWidget : GlanceAppWidget() {
     @Composable
     private fun TaskItem(task: Task, isSmall: Boolean = false) {
         val isCompleted = task.status == "COMPLETED"
-        Row(
-            modifier = GlanceModifier
+        val rowModifier = if (!isSmall) {
+            GlanceModifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
+                .padding(vertical = 3.dp)
+                .background(ColorProvider(ZenIndigo.copy(alpha = 0.08f)))
+                .cornerRadius(8.dp)
+                .padding(horizontal = 6.dp, vertical = 2.dp)
                 .clickable(actionRunCallback<ToggleTaskCallback>(
                     parameters = actionParametersOf(TaskActionHandler.TaskIdKey to task.id)
-                )),
+                ))
+        } else {
+            GlanceModifier
+                .fillMaxWidth()
+                .padding(vertical = 3.dp, horizontal = 2.dp)
+                .clickable(actionRunCallback<ToggleTaskCallback>(
+                    parameters = actionParametersOf(TaskActionHandler.TaskIdKey to task.id)
+                ))
+        }
+        Row(
+            modifier = rowModifier,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
