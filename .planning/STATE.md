@@ -20,10 +20,10 @@ progress:
 
 ## Current Position
 
-**Phase:** 12 of 17 (UX Quick Wins) — complete
+**Phase:** 14 of 17 (Brain Dump Persistence & Sound) — complete
 **Plan:** 02 of 02 (complete)
-**Status:** Phase 12 complete. Ready to plan Phase 13.
-**Last activity:** 2026-03-25 — Phase 12 UX Quick Wins executed (2 plans, 3 tasks, 3 files)
+**Status:** Phase 14 complete. Ready to plan Phase 15.
+**Last activity:** 2026-03-25 — Phase 14 Brain Dump Persistence & Sound executed (2 plans, 4 tasks, 1 file)
 
 [█░░░░░░░░░] 17%
 
@@ -43,6 +43,8 @@ progress:
 | 12 | 02 | 10 | 2 | 2 |
 | Phase 13 P01 | 1 | 1 tasks | 1 files |
 | Phase 13 P02 | 3 | 2 tasks | 1 files |
+| 14 | 01 | 1 | 2 | 1 |
+| 14 | 02 | 2 | 2 | 1 |
 
 ## Accumulated Context
 
@@ -58,6 +60,9 @@ progress:
 - [Phase 13]: val rowModifier if/else pattern for conditional GlanceModifier — GlanceModifier does not support .let chaining
 - [Phase 13]: actionStartActivity requires explicit Intent(context, Klass::class.java) — reified type parameter overload not available in this Glance version
 - [Phase 13]: Clickable placed only on ZenStack Text element (not Row) to avoid scroll conflict with LazyColumn — established in Phase 09
+- [Phase 14]: org.json.JSONArray used for brain dump title serialization — part of Android SDK, no new Gradle dependency
+- [Phase 14]: isCompletingNow captured before coroutine in toggleTaskCompletion from UI-snapshot task parameter to ensure correct toggle direction
+- [Phase 14]: ToneGenerator used instead of SoundPool for task completion ding — no .ogg/.wav asset required; programmatically generates TONE_PROP_BEEP
 
 ### Todos
 
@@ -77,12 +82,12 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-25T11:10:01.338Z
+2026-03-25T11:19:08Z
 
-- Executed Phase 12 UX Quick Wins (Plans 01 and 02).
-- Plan 01: BrainDumpStep Enter/Done keyboard submit via ImeAction.Done + shared submitTask lambda.
-- Plan 02: Today view filters prior-day completed tasks; incomplete tasks get red delete icon; deleteTask added to ViewModel.
+- Executed Phase 14 Brain Dump Persistence & Sound (Plans 01 and 02).
+- Plan 01: SharedPreferences draft persistence for brain dump tasks — saveDraftTasks/loadDraftTasks with JSONArray title serialization, wired into addTask/addSuggestedTask/removeTask/init/saveSession.
+- Plan 02: ToneGenerator ding on task completion — audioManager lazy property, playDingIfAppropriate with silent/vibrate guard, isCompletingNow pre-captured in toggleTaskCompletion.
 
 **Next Steps:**
 
-- Run `/gsd:plan-phase 13` to plan Widget Overhaul.
+- Run `/gsd:plan-phase 15` to plan next phase.
