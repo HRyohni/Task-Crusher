@@ -208,7 +208,8 @@
   1. On first use, the app requests POST_NOTIFICATIONS permission from the user.
   2. When an achievement is unlocked, a system notification appears in the notification shade with the achievement name.
   3. Tapping the notification opens the Achievements tab in the app.
-**Plans**: TBD
+**Plans**: 1 plan
+- [ ] 16-01-PLAN.md — Permission request, notification channel, achievement notification dispatch, and Achievements tab deep-link
 
 ### Phase 17: New Achievements
 **Goal**: Four new behavioral achievements are available to unlock, rewarding consistency, timing, and resilience.
@@ -242,5 +243,5 @@ Phases execute in numeric order: 12 → 13 → 14 → 15 → 16 → 17
 | 13. Widget Overhaul | v1.2 | 0/2 | Not started | - |
 | 14. Brain Dump Persistence & Sound | v1.2 | 0/2 | Not started | - |
 | 15. Calendar Redesign | v1.2 | 0/1 | Not started | - |
-| 16. Push Notifications | v1.2 | 0/TBD | Not started | - |
+| 16. Push Notifications | v1.2 | 0/1 | Not started | - |
 | 17. New Achievements | v1.2 | 0/TBD | Not started | - |
