@@ -1,6 +1,7 @@
 package hr.fipu.organizationtool.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -43,10 +44,10 @@ fun CalendarScreen(
     val paddingCellCount = firstDate.dayOfWeek.value % 7
 
     Column(modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-        // Header
+        // Header — Change 2: titleLarge replaces headlineMedium
         Text(
             text = "Activity",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
         )
@@ -81,27 +82,51 @@ fun CalendarScreen(
             dateCells.chunked(7).forEach { week ->
                 Row(modifier = Modifier.fillMaxWidth()) {
                     week.forEach { date ->
-                        Box(modifier = Modifier.weight(1f)) {
-                            if (date == null) {
-                                Box(modifier = Modifier.size(32.dp))
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .size(32.dp)
-                                        .padding(2.dp)
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .background(heatmapColor(completionHistory[date] ?: 0))
-                                        .clickable { onDaySelected(date) }
-                                )
-                            }
+                        if (date == null) {
+                            // Change 1: empty cell uses weight+aspectRatio (no nested Box)
+                            Box(modifier = Modifier.weight(1f).aspectRatio(1f))
+                        } else {
+                            // Change 1: single Box with weight+aspectRatio replaces nested Box(weight) { Box(size) }
+                            // Change 3: today indicator border appended after background
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(1f)
+                                    .padding(2.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(heatmapColor(completionHistory[date] ?: 0))
+                                    .then(if (date == today) Modifier.border(1.5.dp, ZenIndigo, RoundedCornerShape(4.dp)) else Modifier)
+                                    .clickable { onDaySelected(date) }
+                            )
                         }
                     }
                     // Fill remaining cells in last row if week is not full
                     repeat(7 - week.size) {
-                        Box(modifier = Modifier.weight(1f).size(32.dp))
+                        // Change 1: trailing filler cells also use weight+aspectRatio
+                        Box(modifier = Modifier.weight(1f).aspectRatio(1f))
                     }
                 }
             }
+        }
+
+        // Change 4: Legend row below heatmap grid
+        Row(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Less", style = MaterialTheme.typography.labelSmall, color = ZenGrayMedium)
+            Spacer(Modifier.width(4.dp))
+            listOf(0, 1, 2, 4).forEach { count ->
+                Box(
+                    Modifier
+                        .size(12.dp)
+                        .padding(1.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(heatmapColor(count))
+                )
+            }
+            Spacer(Modifier.width(4.dp))
+            Text("More", style = MaterialTheme.typography.labelSmall, color = ZenGrayMedium)
         }
 
         // Selected day label
@@ -114,15 +139,16 @@ fun CalendarScreen(
             )
         }
 
-        // Divider
-        HorizontalDivider(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
+        // Change 5: Divider only renders when a day is selected
+        if (selectedDay != null) {
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        }
 
-        // Day detail panel
+        // Change 6: Left-aligned detail panel — removed contentAlignment = Alignment.Center
         Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             when {
                 selectedDay == null -> {
@@ -147,7 +173,7 @@ fun CalendarScreen(
                                 color = MaterialTheme.colorScheme.surfaceVariant,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                                    .padding(vertical = 4.dp)
                             ) {
                                 Text(
                                     text = task.title,
