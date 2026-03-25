@@ -245,6 +245,13 @@ class TaskViewModel(
         }
     }
 
+    fun deleteTask(task: Task) {
+        viewModelScope.launch {
+            repository.deleteTask(task)
+            ZenStackWidget().updateAll(application)
+        }
+    }
+
     fun markBackTapGuideAsSeen() {
         viewModelScope.launch {
             onboardingRepository.setHasSeenBackTapGuide(true)
