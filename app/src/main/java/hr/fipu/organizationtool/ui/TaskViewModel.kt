@@ -29,8 +29,10 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
@@ -63,7 +65,11 @@ class TaskViewModel(
             Achievement("streak_3",       "On a Roll",       "3-day streak",         false, null, 0, 3),
             Achievement("streak_7",       "Week Warrior",    "7-day streak",         false, null, 0, 7),
             Achievement("streak_30",      "Unstoppable",     "30-day streak",        false, null, 0, 30),
-            Achievement("speed_run",      "Speed Run",       "Complete all 3 priorities within 1 hour", false, null, 0, 1)
+            Achievement("speed_run",      "Speed Run",       "Complete all 3 priorities within 1 hour", false, null, 0, 1),
+            Achievement("perfect_week",  "Perfect Week",  "Complete all 3 priorities every day for 7 consecutive days", false, null, 0, 7),
+            Achievement("early_bird",    "Early Bird",    "Complete all 3 priorities before noon on any day",           false, null, 0, 3),
+            Achievement("night_owl",     "Night Owl",     "Complete all 3 priorities after 9pm on any day",             false, null, 0, 3),
+            Achievement("comeback_kid",  "Comeback Kid",  "Return after a 7+ day gap and complete a full session",      false, null, 0, 1)
         )
     }
 
@@ -187,6 +193,48 @@ class TaskViewModel(
                 "streak_7"        -> minOf(streak, 7)
                 "streak_30"       -> minOf(streak, 30)
                 "speed_run"       -> if (entity != null) 1 else 0
+                "perfect_week" -> {
+                    val zoneId = ZoneId.systemDefault()
+                    val today = LocalDate.now()
+                    var consecutiveDays = 0
+                    for (daysBack in 0L..6L) {
+                        val day = today.minusDays(daysBack)
+                        val startOfDay = day.atStartOfDay(zoneId).toInstant().toEpochMilli()
+                        val endOfDay = day.plusDays(1).atStartOfDay(zoneId).toInstant().toEpochMilli() - 1
+                        val completedPrioritiesOnDay = allTasks.count { task ->
+                            task.isPriority && task.status == "COMPLETED" &&
+                            task.completedAt != null &&
+                            task.completedAt in startOfDay..endOfDay
+                        }
+                        if (completedPrioritiesOnDay >= 3) consecutiveDays++ else break
+                    }
+                    minOf(consecutiveDays, 7)
+                }
+                "early_bird" -> {
+                    val zoneId = ZoneId.systemDefault()
+                    val today = LocalDate.now()
+                    val startOfToday = today.atStartOfDay(zoneId).toInstant().toEpochMilli()
+                    val endOfToday = today.plusDays(1).atStartOfDay(zoneId).toInstant().toEpochMilli() - 1
+                    allTasks.count { task ->
+                        task.isPriority && task.status == "COMPLETED" &&
+                        task.completedAt != null &&
+                        task.completedAt in startOfToday..endOfToday &&
+                        Instant.ofEpochMilli(task.completedAt).atZone(zoneId).toLocalTime().hour < 12
+                    }.coerceAtMost(3)
+                }
+                "night_owl" -> {
+                    val zoneId = ZoneId.systemDefault()
+                    val today = LocalDate.now()
+                    val startOfToday = today.atStartOfDay(zoneId).toInstant().toEpochMilli()
+                    val endOfToday = today.plusDays(1).atStartOfDay(zoneId).toInstant().toEpochMilli() - 1
+                    allTasks.count { task ->
+                        task.isPriority && task.status == "COMPLETED" &&
+                        task.completedAt != null &&
+                        task.completedAt in startOfToday..endOfToday &&
+                        Instant.ofEpochMilli(task.completedAt).atZone(zoneId).toLocalTime().hour >= 21
+                    }.coerceAtMost(3)
+                }
+                "comeback_kid" -> if (entity != null) 1 else 0
                 else              -> 0
             }
             def.copy(
@@ -241,6 +289,112 @@ class TaskViewModel(
                         if (firstNew == null) {
                             firstNew = ACHIEVEMENT_DEFINITIONS.first { it.id == "speed_run" }
                                 .copy(isUnlocked = true, unlockedAt = now, progress = 1)
+                        }
+                    }
+                }
+            }
+
+            // Perfect Week: all 3 priorities completed every day for the last 7 consecutive days
+            if ("perfect_week" !in alreadyUnlocked) {
+                val zoneId = ZoneId.systemDefault()
+                val today = LocalDate.now()
+                var perfectDays = 0
+                for (daysBack in 0L..6L) {
+                    val day = today.minusDays(daysBack)
+                    val startOfDay = day.atStartOfDay(zoneId).toInstant().toEpochMilli()
+                    val endOfDay = day.plusDays(1).atStartOfDay(zoneId).toInstant().toEpochMilli() - 1
+                    val completedPrioritiesOnDay = allTasks.count { task ->
+                        task.isPriority && task.status == "COMPLETED" &&
+                        task.completedAt != null &&
+                        task.completedAt in startOfDay..endOfDay
+                    }
+                    if (completedPrioritiesOnDay >= 3) perfectDays++ else break
+                }
+                if (perfectDays >= 7) {
+                    val now = System.currentTimeMillis()
+                    achievementDao.insert(AchievementEntity("perfect_week", now))
+                    if (firstNew == null) {
+                        firstNew = ACHIEVEMENT_DEFINITIONS.first { it.id == "perfect_week" }
+                            .copy(isUnlocked = true, unlockedAt = now, progress = 7)
+                    }
+                }
+            }
+
+            // Early Bird: all 3 priorities completed before noon today
+            if ("early_bird" !in alreadyUnlocked) {
+                val zoneId = ZoneId.systemDefault()
+                val today = LocalDate.now()
+                val startOfToday = today.atStartOfDay(zoneId).toInstant().toEpochMilli()
+                val endOfToday = today.plusDays(1).atStartOfDay(zoneId).toInstant().toEpochMilli() - 1
+                val earlyBirdCount = allTasks.count { task ->
+                    task.isPriority && task.status == "COMPLETED" &&
+                    task.completedAt != null &&
+                    task.completedAt in startOfToday..endOfToday &&
+                    Instant.ofEpochMilli(task.completedAt).atZone(zoneId).toLocalTime().hour < 12
+                }
+                if (earlyBirdCount >= 3) {
+                    val now = System.currentTimeMillis()
+                    achievementDao.insert(AchievementEntity("early_bird", now))
+                    if (firstNew == null) {
+                        firstNew = ACHIEVEMENT_DEFINITIONS.first { it.id == "early_bird" }
+                            .copy(isUnlocked = true, unlockedAt = now, progress = 3)
+                    }
+                }
+            }
+
+            // Night Owl: all 3 priorities completed after 9pm today
+            if ("night_owl" !in alreadyUnlocked) {
+                val zoneId = ZoneId.systemDefault()
+                val today = LocalDate.now()
+                val startOfToday = today.atStartOfDay(zoneId).toInstant().toEpochMilli()
+                val endOfToday = today.plusDays(1).atStartOfDay(zoneId).toInstant().toEpochMilli() - 1
+                val nightOwlCount = allTasks.count { task ->
+                    task.isPriority && task.status == "COMPLETED" &&
+                    task.completedAt != null &&
+                    task.completedAt in startOfToday..endOfToday &&
+                    Instant.ofEpochMilli(task.completedAt).atZone(zoneId).toLocalTime().hour >= 21
+                }
+                if (nightOwlCount >= 3) {
+                    val now = System.currentTimeMillis()
+                    achievementDao.insert(AchievementEntity("night_owl", now))
+                    if (firstNew == null) {
+                        firstNew = ACHIEVEMENT_DEFINITIONS.first { it.id == "night_owl" }
+                            .copy(isUnlocked = true, unlockedAt = now, progress = 3)
+                    }
+                }
+            }
+
+            // Comeback Kid: completes all 3 priorities today after a 7+ day gap from last activity
+            if ("comeback_kid" !in alreadyUnlocked) {
+                val zoneId = ZoneId.systemDefault()
+                val today = LocalDate.now()
+                val startOfToday = today.atStartOfDay(zoneId).toInstant().toEpochMilli()
+                val endOfToday = today.plusDays(1).atStartOfDay(zoneId).toInstant().toEpochMilli() - 1
+
+                val priorityTasks = allTasks.filter { it.isPriority }
+                val allPrioritiesDoneToday = priorityTasks.size == 3 &&
+                    priorityTasks.all { task ->
+                        task.status == "COMPLETED" &&
+                        task.completedAt != null &&
+                        task.completedAt in startOfToday..endOfToday
+                    }
+
+                if (allPrioritiesDoneToday) {
+                    val lastActivityBeforeToday = allTasks
+                        .mapNotNull { it.completedAt }
+                        .filter { it < startOfToday }
+                        .maxOrNull()
+
+                    if (lastActivityBeforeToday != null) {
+                        val lastDate = Instant.ofEpochMilli(lastActivityBeforeToday).atZone(zoneId).toLocalDate()
+                        val gapDays = ChronoUnit.DAYS.between(lastDate, today)
+                        if (gapDays >= 7) {
+                            val now = System.currentTimeMillis()
+                            achievementDao.insert(AchievementEntity("comeback_kid", now))
+                            if (firstNew == null) {
+                                firstNew = ACHIEVEMENT_DEFINITIONS.first { it.id == "comeback_kid" }
+                                    .copy(isUnlocked = true, unlockedAt = now, progress = 1)
+                            }
                         }
                     }
                 }
