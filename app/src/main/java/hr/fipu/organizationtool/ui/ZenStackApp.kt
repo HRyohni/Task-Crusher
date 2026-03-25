@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.NavigationBar
@@ -48,7 +49,9 @@ import nl.dionsegijn.konfetti.core.PartySystem
 import nl.dionsegijn.konfetti.core.Position
 import nl.dionsegijn.konfetti.core.emitter.Emitter
 import org.koin.androidx.compose.koinViewModel
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 enum class MainTab { TODAY, CALENDAR, ACHIEVEMENTS }
@@ -87,6 +90,7 @@ fun ZenStackApp(viewModel: TaskViewModel = koinViewModel()) {
                 tasks = savedTasks!!,
                 onRestart = { showSetup = true },
                 onToggleComplete = { task -> viewModel.toggleTaskCompletion(task) },
+                onDeleteTask = { task -> viewModel.deleteTask(task) },
                 completionHistory = completionHistory,
                 selectedDay = selectedDay,
                 tasksForSelectedDay = tasksForSelectedDay,
@@ -118,6 +122,7 @@ fun MainShell(
     tasks: List<Task>,
     onRestart: () -> Unit,
     onToggleComplete: (Task) -> Unit,
+    onDeleteTask: (Task) -> Unit,
     completionHistory: Map<LocalDate, Int>,
     selectedDay: LocalDate?,
     tasksForSelectedDay: List<Task>,
@@ -155,7 +160,8 @@ fun MainShell(
                 MainTab.TODAY -> CurrentTasksView(
                     tasks = tasks,
                     onRestart = onRestart,
-                    onToggleComplete = onToggleComplete
+                    onToggleComplete = onToggleComplete,
+                    onDeleteTask = onDeleteTask
                 )
                 MainTab.CALENDAR -> CalendarScreen(
                     completionHistory = completionHistory,
@@ -284,11 +290,21 @@ fun SetupFlow(viewModel: TaskViewModel, onFinished: () -> Unit) {
 fun CurrentTasksView(
     tasks: List<Task>,
     onRestart: () -> Unit,
-    onToggleComplete: (Task) -> Unit
+    onToggleComplete: (Task) -> Unit,
+    onDeleteTask: (Task) -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
-    val priorityTasks = tasks.filter { it.isPriority }
-    val otherTasks = tasks.filter { !it.isPriority }
+
+    val today = LocalDate.now()
+    val zoneId = ZoneId.systemDefault()
+
+    fun Task.completedToday(): Boolean {
+        val at = completedAt ?: return false
+        return Instant.ofEpochMilli(at).atZone(zoneId).toLocalDate() == today
+    }
+
+    val priorityTasks = tasks.filter { it.isPriority && (it.status != "COMPLETED" || it.completedToday()) }
+    val otherTasks = tasks.filter { !it.isPriority && (it.status != "COMPLETED" || it.completedToday()) }
 
     val allComplete = priorityTasks.isNotEmpty() && priorityTasks.all { it.status == "COMPLETED" }
 
@@ -323,20 +339,30 @@ fun CurrentTasksView(
                 item { Text("Top 3 Priorities", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary) }
 
                 items(priorityTasks) { task ->
-                    TaskCard(task, isPriority = true) {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onToggleComplete(task)
-                    }
+                    TaskCard(
+                        task,
+                        isPriority = true,
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onToggleComplete(task)
+                        },
+                        onDelete = { onDeleteTask(task) }
+                    )
                 }
 
                 if (otherTasks.isNotEmpty()) {
                     item { Spacer(modifier = Modifier.height(8.dp)) }
                     item { Text("Brain Dump", style = MaterialTheme.typography.titleMedium) }
                     items(otherTasks) { task ->
-                        TaskCard(task, isPriority = false) {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onToggleComplete(task)
-                        }
+                        TaskCard(
+                            task,
+                            isPriority = false,
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onToggleComplete(task)
+                            },
+                            onDelete = { onDeleteTask(task) }
+                        )
                     }
                 }
             }
@@ -363,7 +389,7 @@ fun CurrentTasksView(
 }
 
 @Composable
-fun TaskCard(task: Task, isPriority: Boolean, onClick: () -> Unit) {
+fun TaskCard(task: Task, isPriority: Boolean, onClick: () -> Unit, onDelete: (() -> Unit)? = null) {
     val isCompleted = task.status == "COMPLETED"
     Surface(
         modifier = Modifier
@@ -380,9 +406,19 @@ fun TaskCard(task: Task, isPriority: Boolean, onClick: () -> Unit) {
             Checkbox(checked = isCompleted, onCheckedChange = { onClick() })
             Text(
                 text = task.title,
+                modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyLarge,
                 textDecoration = if (isCompleted) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
             )
+            if (onDelete != null && task.status != "COMPLETED") {
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Delete task",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
     }
 }
