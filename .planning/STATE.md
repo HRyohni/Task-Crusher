@@ -20,10 +20,10 @@ progress:
 
 ## Current Position
 
-**Phase:** 14 of 17 (Brain Dump Persistence & Sound) — complete
-**Plan:** 02 of 02 (complete)
-**Status:** Phase 14 complete. Ready to plan Phase 15.
-**Last activity:** 2026-03-25 — Phase 14 Brain Dump Persistence & Sound executed (2 plans, 4 tasks, 1 file)
+**Phase:** 15 of 17 (Calendar Redesign) — in progress
+**Plan:** 01 of 01 (complete)
+**Status:** Phase 15 Plan 01 complete. Awaiting human visual verification.
+**Last activity:** 2026-03-25 — Phase 15 Calendar Screen Redesign executed (1 plan, 2 tasks, 1 file)
 
 [█░░░░░░░░░] 17%
 
@@ -45,6 +45,7 @@ progress:
 | Phase 13 P02 | 3 | 2 tasks | 1 files |
 | 14 | 01 | 1 | 2 | 1 |
 | 14 | 02 | 2 | 2 | 1 |
+| 15 | 01 | 5 | 2 | 1 |
 
 ## Accumulated Context
 
@@ -82,12 +83,12 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-25T11:19:08Z
+2026-03-25T00:00:00Z
 
-- Executed Phase 14 Brain Dump Persistence & Sound (Plans 01 and 02).
-- Plan 01: SharedPreferences draft persistence for brain dump tasks — saveDraftTasks/loadDraftTasks with JSONArray title serialization, wired into addTask/addSuggestedTask/removeTask/init/saveSession.
-- Plan 02: ToneGenerator ding on task completion — audioManager lazy property, playDingIfAppropriate with silent/vibrate guard, isCompletingNow pre-captured in toggleTaskCompletion.
+- Executed Phase 15 Calendar Screen Redesign (Plan 01).
+- Plan 01: Six visual fixes to CalendarScreen.kt — proportional cells (weight+aspectRatio), titleLarge header, today indicator border, legend row, conditional divider, left-aligned detail panel.
 
 **Next Steps:**
 
-- Run `/gsd:plan-phase 15` to plan next phase.
+- Visual verification of redesigned CalendarScreen on device/emulator.
+- Run `/gsd:plan-phase 16` to plan next phase after verification.
