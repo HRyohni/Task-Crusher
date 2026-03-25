@@ -13,7 +13,10 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.LinearProgressIndicator
+import android.content.Intent
 import androidx.glance.appwidget.action.actionRunCallback
+import androidx.glance.appwidget.action.actionStartActivity
+import hr.fipu.organizationtool.MainActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
@@ -52,6 +55,7 @@ class ZenStackWidget : GlanceAppWidget() {
                     ) {
                         Text(
                             text = "ZenStack",
+                            modifier = GlanceModifier.clickable(actionStartActivity(Intent(context, MainActivity::class.java))),
                             style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorProvider(ZenIndigo))
                         )
                         Spacer(modifier = GlanceModifier.defaultWeight())
