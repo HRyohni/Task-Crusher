@@ -197,7 +197,8 @@
   1. Calendar screen displays without overflow or clipping on standard phone screen sizes.
   2. Activity heatmap cells and day drill-down text are legible at default font sizes.
   3. The redesigned layout feels consistent with the rest of the app's visual language.
-**Plans**: TBD
+**Plans**: 1 plan
+- [ ] 15-01-PLAN.md — Calendar screen visual redesign (UX-04)
 
 ### Phase 16: Push Notifications
 **Goal**: Users receive a system push notification each time they unlock a new achievement.
@@ -240,6 +241,6 @@ Phases execute in numeric order: 12 → 13 → 14 → 15 → 16 → 17
 | 12. UX Quick Wins | v1.2 | 0/2 | Not started | - |
 | 13. Widget Overhaul | v1.2 | 0/2 | Not started | - |
 | 14. Brain Dump Persistence & Sound | v1.2 | 0/2 | Not started | - |
-| 15. Calendar Redesign | v1.2 | 0/TBD | Not started | - |
+| 15. Calendar Redesign | v1.2 | 0/1 | Not started | - |
 | 16. Push Notifications | v1.2 | 0/TBD | Not started | - |
 | 17. New Achievements | v1.2 | 0/TBD | Not started | - |
