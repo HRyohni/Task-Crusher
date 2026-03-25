@@ -183,9 +183,11 @@
 **Requirements**: TASK-02, WIDG-03
 **Success Criteria** (what must be TRUE):
   1. Brain dump tasks entered during setup are still present when the app is reopened after being closed mid-session.
-  2. A low-latency "ding" sound plays when a task is marked complete (SoundPool).
+  2. A low-latency "ding" sound plays when a task is marked complete (ToneGenerator).
   3. Sound respects the device's silent/DND state and does not play when muted.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 14-01-PLAN.md — SharedPreferences brain dump draft persistence (TASK-02)
+- [ ] 14-02-PLAN.md — ToneGenerator ding on task completion (WIDG-03)
 
 ### Phase 15: Calendar Redesign
 **Goal**: The calendar screen is visually clear, fits the screen without overflow, and is comfortable to read.
@@ -237,7 +239,7 @@ Phases execute in numeric order: 12 → 13 → 14 → 15 → 16 → 17
 | 11. Achievements System | v1.1 | 3/3 | Complete | 2026-03-24 |
 | 12. UX Quick Wins | v1.2 | 0/2 | Not started | - |
 | 13. Widget Overhaul | v1.2 | 0/2 | Not started | - |
-| 14. Brain Dump Persistence & Sound | v1.2 | 0/TBD | Not started | - |
+| 14. Brain Dump Persistence & Sound | v1.2 | 0/2 | Not started | - |
 | 15. Calendar Redesign | v1.2 | 0/TBD | Not started | - |
 | 16. Push Notifications | v1.2 | 0/TBD | Not started | - |
 | 17. New Achievements | v1.2 | 0/TBD | Not started | - |
