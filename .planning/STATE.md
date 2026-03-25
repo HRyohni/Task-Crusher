@@ -42,6 +42,7 @@ progress:
 | 12 | 01 | 5 | 1 | 1 |
 | 12 | 02 | 10 | 2 | 2 |
 | Phase 13 P01 | 1 | 1 tasks | 1 files |
+| Phase 13 P02 | 3 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -55,6 +56,8 @@ progress:
 - [Phase 12]: Today-only completed task filter uses local extension function Task.completedToday() scoped inside CurrentTasksView composable.
 - [Phase 12]: TaskCard onDelete is nullable ((() -> Unit)?) so existing usages compile unchanged; delete icon only shown on incomplete tasks.
 - [Phase 13]: val rowModifier if/else pattern for conditional GlanceModifier — GlanceModifier does not support .let chaining
+- [Phase 13]: actionStartActivity requires explicit Intent(context, Klass::class.java) — reified type parameter overload not available in this Glance version
+- [Phase 13]: Clickable placed only on ZenStack Text element (not Row) to avoid scroll conflict with LazyColumn — established in Phase 09
 
 ### Todos
 
@@ -74,7 +77,7 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-25T11:07:04.446Z
+2026-03-25T11:10:01.338Z
 
 - Executed Phase 12 UX Quick Wins (Plans 01 and 02).
 - Plan 01: BrainDumpStep Enter/Done keyboard submit via ImeAction.Done + shared submitTask lambda.
