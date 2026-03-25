@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Polish & Power
-status: In Progress
-last_updated: "2026-03-25T12:00:00.000Z"
+status: Milestone v1.2 complete. Ready for /gsd:complete-milestone or new milestone.
+last_updated: "2026-03-25T14:00:00.000Z"
 progress:
   total_phases: 6
   completed_phases: 1
@@ -20,10 +20,10 @@ progress:
 
 ## Current Position
 
-**Phase:** 16 of 17 (Push Notifications) — complete
+**Phase:** 17 of 17 (New Achievements) — complete. v1.2 milestone complete.
 **Plan:** 01 of 01 (complete)
-**Status:** Phase 16 complete. Ready to plan Phase 17.
-**Last activity:** 2026-03-25 — Phase 16 Push Notifications complete (1 plan, 2 tasks, 5 files)
+**Status:** Milestone v1.2 complete. Ready for /gsd:complete-milestone or new milestone.
+**Last activity:** 2026-03-25 — Phase 17 New Achievements complete (1 plan, 2 tasks, 1 file)
 
 [█░░░░░░░░░] 17%
 
@@ -47,6 +47,7 @@ progress:
 | 14 | 02 | 2 | 2 | 1 |
 | 15 | 01 | ~5 | 2 | 1 |
 | 16 | 01 | ~10 | 2 | 5 |
+| 17 | 01 | ~15 | 2 | 1 |
 
 ## Accumulated Context
 
@@ -67,10 +68,11 @@ progress:
 - [Phase 14]: ToneGenerator used instead of SoundPool for task completion ding — no .ogg/.wav asset required; programmatically generates TONE_PROP_BEEP
 - [Phase 15]: weight(1f).aspectRatio(1f) cell pattern for proportional Compose heatmap grid — eliminates fixed-size overflow on all screen widths
 - [Phase 16]: sendAchievementNotification in TaskViewModel uses constructor-injected application field (plain ViewModel, not AndroidViewModel) — not getApplication()
+- [Phase 17]: New achievements (perfect_week/early_bird/night_owl/comeback_kid) use same checkAndUnlockAchievements() infrastructure — progress computed from allTasks StateFlow completedAt timestamps
 
 ### Todos
 
-- [ ] Plan Phase 17: New Achievements
+- [x] v1.2 Polish & Power milestone COMPLETE
 
 ### Blockers
 
@@ -86,11 +88,11 @@ progress:
 ## Session Continuity
 
 **Last Session:**
-2026-03-25T13:00:00Z
+2026-03-25T14:00:00Z
 
-- Phase 16 Push Notifications complete and committed (38b7a5f).
-- Plan 01: POST_NOTIFICATIONS permission, singleTop launch mode, notification channel in ZenStackApplication, sendAchievementNotification in TaskViewModel, permission request + deep-link wiring in MainActivity, initialTab param in ZenStackApp/MainShell.
+- Phase 17 New Achievements complete and committed.
+- Plan 01: Added 4 new behavioral achievements (perfect_week, early_bird, night_owl, comeback_kid) to TaskViewModel.kt using existing checkAndUnlockAchievements() infrastructure. AchievementsScreen required no changes — fully data-driven. 12 total achievements now visible in Achievements tab.
 
 **Next Steps:**
 
-- Run `/gsd:plan-phase 17` to plan New Achievements phase.
+- Run `/gsd:complete-milestone` to close out v1.2 Polish & Power, or start planning new milestone.
