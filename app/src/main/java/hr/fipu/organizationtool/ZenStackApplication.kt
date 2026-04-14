@@ -22,14 +22,23 @@ class ZenStackApplication : Application() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
+            val manager = getSystemService(NotificationManager::class.java)
+            val achievementChannel = NotificationChannel(
                 "achievement_unlocked",
                 "Achievement Unlocked",
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
                 description = "Notifies when a new achievement is unlocked"
             }
-            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+            val scheduledChannel = NotificationChannel(
+                "scheduled_task",
+                "Scheduled Tasks",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Reminds you about tasks scheduled for today"
+            }
+            manager.createNotificationChannel(achievementChannel)
+            manager.createNotificationChannel(scheduledChannel)
         }
     }
 }

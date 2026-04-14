@@ -42,7 +42,8 @@ fun AchievementsScreen(
             )
         }
 
-        items(achievements, key = { it.id }) { achievement ->
+        val sorted = achievements.sortedByDescending { it.isUnlocked }
+        items(sorted, key = { it.id }) { achievement ->
             AchievementCard(achievement = achievement)
         }
     }

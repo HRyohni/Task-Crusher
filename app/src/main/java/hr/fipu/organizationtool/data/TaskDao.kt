@@ -32,6 +32,9 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE completedAt BETWEEN :startOfDay AND :endOfDay")
     fun getTasksCompletedOn(startOfDay: Long, endOfDay: Long): Flow<List<Task>>
 
+    @Query("SELECT * FROM tasks WHERE scheduledFor BETWEEN :startOfDay AND :endOfDay ORDER BY createdAt DESC")
+    fun getTasksScheduledOn(startOfDay: Long, endOfDay: Long): Flow<List<Task>>
+
     @Query("DELETE FROM tasks")
     suspend fun deleteAllTasks()
 

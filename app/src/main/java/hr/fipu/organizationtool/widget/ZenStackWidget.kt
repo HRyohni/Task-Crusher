@@ -16,6 +16,7 @@ import androidx.glance.appwidget.LinearProgressIndicator
 import android.content.Intent
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
+import hr.fipu.organizationtool.ui.AddTaskActivity
 import hr.fipu.organizationtool.MainActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
@@ -38,10 +39,26 @@ class ZenStackWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repository = TaskRepository(AppDatabase.getDatabase(context).taskDao())
 
+        val widgetTitles = listOf(
+            "Success Farmer",
+            "Money Generator",
+            "Goal Crusher",
+            "Dream Builder",
+            "Focus Machine",
+            "Task Slayer",
+            "Grind Mode",
+            "Level Up",
+            "Boss Moves",
+            "Win Factory",
+            "Aura Farming",
+            "Unstoppable Machine"
+        )
+
         provideContent {
             val priorityTasks by repository.priorityTasks.collectAsState(initial = emptyList())
             val otherTasks by repository.allNonPriorityTasks.collectAsState(initial = emptyList())
             val completedCount = priorityTasks.count { it.status == "COMPLETED" }
+            val widgetTitle = widgetTitles[(System.currentTimeMillis() / 60000 % widgetTitles.size).toInt()]
             val progress = completedCount.toFloat() / priorityTasks.size.coerceAtLeast(1)
 
             val activeBrainDumpTasks = otherTasks.filter { it.status != "COMPLETED" }
@@ -55,7 +72,7 @@ class ZenStackWidget : GlanceAppWidget() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "ZenStack",
+                            text = widgetTitle,
                             modifier = GlanceModifier.clickable(actionStartActivity(Intent(context, MainActivity::class.java))),
                             style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorProvider(ZenIndigo))
                         )
@@ -64,6 +81,25 @@ class ZenStackWidget : GlanceAppWidget() {
                             text = "$completedCount/${priorityTasks.size}",
                             style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = ColorProvider(ZenGrayDark))
                         )
+                        Spacer(modifier = GlanceModifier.width(4.dp))
+                        Box(
+                            modifier = GlanceModifier
+                                .padding(horizontal = 18.dp, vertical = 8.dp)
+                                .cornerRadius(8.dp)
+                                .background(ColorProvider(ZenIndigo.copy(alpha = 0.35f)))
+                                .clickable(
+                                    actionStartActivity(
+                                        Intent(context, AddTaskActivity::class.java)
+                                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "+",
+                                style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, color = ColorProvider(ZenIndigo))
+                            )
+                        }
                     }
                 }
                 // Progress bar
@@ -83,7 +119,7 @@ class ZenStackWidget : GlanceAppWidget() {
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp)
                                 .background(ColorProvider(ZenIndigo.copy(alpha = 0.12f)))
-                                .cornerRadius(10.dp)
+                                .cornerRadius(3.dp)
                                 .padding(horizontal = 12.dp, vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalAlignment = Alignment.CenterHorizontally
@@ -91,7 +127,7 @@ class ZenStackWidget : GlanceAppWidget() {
                             Text(
                                 text = "All done! Great work.",
                                 style = TextStyle(
-                                    fontSize = 13.sp,
+                                    fontSize = 30.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = ColorProvider(ZenIndigo)
                                 )
@@ -103,8 +139,8 @@ class ZenStackWidget : GlanceAppWidget() {
                 item {
                     Text(
                         text = "Priority",
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 13.sp, color = ColorProvider(ZenGrayDark)),
-                        modifier = GlanceModifier.padding(bottom = 4.dp)
+                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp, color = ColorProvider(ZenGrayDark)),
+                        modifier = GlanceModifier.padding(top = 2.dp, bottom = 4.dp)
                     )
                 }
                 // Priority task rows — no cap, all tasks
@@ -132,45 +168,67 @@ class ZenStackWidget : GlanceAppWidget() {
     @Composable
     private fun TaskItem(task: Task, isSmall: Boolean = false) {
         val isCompleted = task.status == "COMPLETED"
-        val rowModifier = if (!isSmall) {
-            GlanceModifier
-                .fillMaxWidth()
-                .padding(vertical = 3.dp)
-                .background(ColorProvider(ZenIndigo.copy(alpha = 0.08f)))
-                .cornerRadius(8.dp)
-                .padding(horizontal = 6.dp, vertical = 2.dp)
-                .clickable(actionRunCallback<ToggleTaskCallback>(
-                    parameters = actionParametersOf(TaskActionHandler.TaskIdKey to task.id)
-                ))
+        if (!isSmall) {
+            Box(modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                Row(
+                    modifier = GlanceModifier
+                        .fillMaxWidth()
+                        .background(ColorProvider(ZenIndigo.copy(alpha = 0.18f)))
+                        .cornerRadius(8.dp)
+                        .padding(horizontal = 10.dp, vertical = 10.dp)
+                        .clickable(actionRunCallback<ToggleTaskCallback>(
+                            parameters = actionParametersOf(TaskActionHandler.TaskIdKey to task.id)
+                        )),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TaskItemContent(task, isSmall = false, isCompleted = isCompleted)
+                }
+            }
         } else {
-            GlanceModifier
-                .fillMaxWidth()
-                .padding(vertical = 3.dp, horizontal = 2.dp)
-                .clickable(actionRunCallback<ToggleTaskCallback>(
-                    parameters = actionParametersOf(TaskActionHandler.TaskIdKey to task.id)
-                ))
+            Row(
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .padding(vertical = 3.dp, horizontal = 2.dp)
+                    .clickable(actionRunCallback<ToggleTaskCallback>(
+                        parameters = actionParametersOf(TaskActionHandler.TaskIdKey to task.id)
+                    )),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TaskItemContent(task, isSmall = true, isCompleted = isCompleted)
+            }
         }
-        Row(
-            modifier = rowModifier,
-            verticalAlignment = Alignment.CenterVertically
+    }
+
+    @Composable
+    private fun TaskItemContent(task: Task, isSmall: Boolean, isCompleted: Boolean) {
+        val circleSize = if (isSmall) 18.dp else 22.dp
+        Box(
+            modifier = GlanceModifier
+                .size(circleSize)
+                .cornerRadius(circleSize / 2)
+                .background(ColorProvider(if (isCompleted) ZenIndigo else Color.White)),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = if (isCompleted) "☑" else "☐",
-                modifier = GlanceModifier.padding(end = 8.dp),
-                style = TextStyle(
-                    fontSize = if (isSmall) 14.sp else 18.sp,
-                    color = ColorProvider(if (isCompleted) ZenIndigo else ZenGrayDark)
+            if (isCompleted) {
+                Text(
+                    text = "✓",
+                    style = TextStyle(
+                        fontSize = if (isSmall) 10.sp else 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ColorProvider(Color.White)
+                    )
                 )
-            )
-            Text(
-                text = task.title,
-                style = TextStyle(
-                    fontSize = if (isSmall) 12.sp else 14.sp,
-                    color = ColorProvider(if (isCompleted) ZenGrayDark.copy(alpha = 0.5f) else ZenGrayDark),
-                    textDecoration = if (isCompleted) TextDecoration.LineThrough else null
-                )
-            )
+            }
         }
+        Spacer(modifier = GlanceModifier.width(8.dp))
+        Text(
+            text = task.title,
+            style = TextStyle(
+                fontSize = if (isSmall) 12.sp else 14.sp,
+                color = ColorProvider(if (isCompleted) ZenGrayDark.copy(alpha = 0.5f) else ZenGrayDark),
+                textDecoration = if (isCompleted) TextDecoration.LineThrough else null
+            )
+        )
     }
 }
 

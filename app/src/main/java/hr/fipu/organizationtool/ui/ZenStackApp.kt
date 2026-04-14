@@ -1,20 +1,28 @@
 package hr.fipu.organizationtool.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Delete
@@ -27,20 +35,28 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import hr.fipu.organizationtool.data.Task
+import hr.fipu.organizationtool.ui.theme.ZenCardPurple
+import hr.fipu.organizationtool.ui.theme.ZenDeepPurple
+import hr.fipu.organizationtool.ui.theme.ZenIndigo
 import hr.fipu.organizationtool.ui.theme.zenShadow
 import hr.fipu.organizationtool.ui.theme.zenSpring
-import hr.fipu.organizationtool.ui.components.BackTapOnboarding
+
 import kotlinx.coroutines.delay
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
@@ -72,6 +88,7 @@ fun ZenStackApp(viewModel: TaskViewModel = koinViewModel(), openAchievementsTab:
     val completionHistory by viewModel.completionHistory.collectAsState()
     val selectedDay by viewModel.selectedDay.collectAsState()
     val tasksForSelectedDay by viewModel.tasksForSelectedDay.collectAsState()
+    val scheduledTasksForSelectedDay by viewModel.scheduledTasksForSelectedDay.collectAsState()
     val newlyUnlockedAchievement by viewModel.newlyUnlockedAchievement.collectAsState()
     val achievements by viewModel.achievements.collectAsState()
 
@@ -91,10 +108,13 @@ fun ZenStackApp(viewModel: TaskViewModel = koinViewModel(), openAchievementsTab:
                 onRestart = { showSetup = true },
                 onToggleComplete = { task -> viewModel.toggleTaskCompletion(task) },
                 onDeleteTask = { task -> viewModel.deleteTask(task) },
+                onAddTask = { title -> viewModel.addTaskToSession(title) },
                 completionHistory = completionHistory,
                 selectedDay = selectedDay,
                 tasksForSelectedDay = tasksForSelectedDay,
+                scheduledTasksForSelectedDay = scheduledTasksForSelectedDay,
                 onDaySelected = { date -> viewModel.selectDay(date) },
+                onAddScheduledTask = { title, date -> viewModel.addScheduledTask(title, date) },
                 achievements = achievements,
                 initialTab = if (openAchievementsTab) MainTab.ACHIEVEMENTS else MainTab.TODAY
             )
@@ -124,58 +144,123 @@ fun MainShell(
     onRestart: () -> Unit,
     onToggleComplete: (Task) -> Unit,
     onDeleteTask: (Task) -> Unit,
+    onAddTask: (String) -> Unit,
     completionHistory: Map<LocalDate, Int>,
     selectedDay: LocalDate?,
     tasksForSelectedDay: List<Task>,
+    scheduledTasksForSelectedDay: List<Task>,
     onDaySelected: (LocalDate) -> Unit,
+    onAddScheduledTask: (String, LocalDate) -> Unit,
     achievements: List<Achievement>,
     initialTab: MainTab = MainTab.TODAY
 ) {
     var selectedTab by remember { mutableStateOf(initialTab) }
+    val tabs = MainTab.entries
+    var dragAccum by remember { mutableStateOf(0f) }
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = ZenDeepPurple,
+                contentColor = Color.White
+            ) {
                 NavigationBarItem(
                     selected = selectedTab == MainTab.TODAY,
                     onClick = { selectedTab = MainTab.TODAY },
                     icon = { Icon(Icons.Default.Home, contentDescription = "Today") },
-                    label = { Text("Today") }
+                    label = { Text("Today") },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = ZenIndigo,
+                        selectedTextColor = ZenIndigo,
+                        unselectedIconColor = Color.White.copy(alpha = 0.6f),
+                        unselectedTextColor = Color.White.copy(alpha = 0.6f),
+                        indicatorColor = ZenIndigo.copy(alpha = 0.15f)
+                    )
                 )
                 NavigationBarItem(
                     selected = selectedTab == MainTab.CALENDAR,
                     onClick = { selectedTab = MainTab.CALENDAR },
                     icon = { Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar") },
-                    label = { Text("Calendar") }
+                    label = { Text("Calendar") },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = ZenIndigo,
+                        selectedTextColor = ZenIndigo,
+                        unselectedIconColor = Color.White.copy(alpha = 0.6f),
+                        unselectedTextColor = Color.White.copy(alpha = 0.6f),
+                        indicatorColor = ZenIndigo.copy(alpha = 0.15f)
+                    )
                 )
                 NavigationBarItem(
                     selected = selectedTab == MainTab.ACHIEVEMENTS,
                     onClick = { selectedTab = MainTab.ACHIEVEMENTS },
                     icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Achievements") },
-                    label = { Text("Achievements") }
+                    label = { Text("Achievements") },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = ZenIndigo,
+                        selectedTextColor = ZenIndigo,
+                        unselectedIconColor = Color.White.copy(alpha = 0.6f),
+                        unselectedTextColor = Color.White.copy(alpha = 0.6f),
+                        indicatorColor = ZenIndigo.copy(alpha = 0.15f)
+                    )
                 )
             }
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-            when (selectedTab) {
-                MainTab.TODAY -> CurrentTasksView(
-                    tasks = tasks,
-                    onRestart = onRestart,
-                    onToggleComplete = onToggleComplete,
-                    onDeleteTask = onDeleteTask
-                )
-                MainTab.CALENDAR -> CalendarScreen(
-                    completionHistory = completionHistory,
-                    selectedDay = selectedDay,
-                    tasksForSelectedDay = tasksForSelectedDay,
-                    onDaySelected = onDaySelected,
-                    modifier = Modifier.fillMaxSize()
-                )
-                MainTab.ACHIEVEMENTS -> AchievementsScreen(
-                    achievements = achievements,
-                    modifier = Modifier.fillMaxSize()
-                )
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .pointerInput(selectedTab) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = { dragAccum = 0f },
+                        onDragCancel = { dragAccum = 0f },
+                        onHorizontalDrag = { change, dragAmount ->
+                            change.consume()
+                            dragAccum += dragAmount
+                            if (dragAccum < -80f) {
+                                val idx = tabs.indexOf(selectedTab)
+                                if (idx < tabs.lastIndex) selectedTab = tabs[idx + 1]
+                                dragAccum = 0f
+                            } else if (dragAccum > 80f) {
+                                val idx = tabs.indexOf(selectedTab)
+                                if (idx > 0) selectedTab = tabs[idx - 1]
+                                dragAccum = 0f
+                            }
+                        }
+                    )
+                }
+        ) {
+            AnimatedContent(
+                targetState = selectedTab,
+                transitionSpec = {
+                    val direction = if (tabs.indexOf(targetState) > tabs.indexOf(initialState)) 1 else -1
+                    (slideInHorizontally(tween(300)) { it * direction } + fadeIn(tween(200))) togetherWith
+                    (slideOutHorizontally(tween(300)) { -it * direction } + fadeOut(tween(200)))
+                },
+                label = "TabTransition"
+            ) { tab ->
+                when (tab) {
+                    MainTab.TODAY -> CurrentTasksView(
+                        tasks = tasks,
+                        onRestart = onRestart,
+                        onToggleComplete = onToggleComplete,
+                        onDeleteTask = onDeleteTask,
+                        onAddTask = onAddTask
+                    )
+                    MainTab.CALENDAR -> CalendarScreen(
+                        completionHistory = completionHistory,
+                        selectedDay = selectedDay,
+                        tasksForSelectedDay = tasksForSelectedDay,
+                        scheduledTasksForSelectedDay = scheduledTasksForSelectedDay,
+                        onDaySelected = onDaySelected,
+                        onAddScheduledTask = onAddScheduledTask,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    MainTab.ACHIEVEMENTS -> AchievementsScreen(
+                        achievements = achievements,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }
@@ -228,9 +313,11 @@ fun AchievementUnlockBanner(achievement: Achievement, onDismiss: () -> Unit) {
 fun SetupFlow(viewModel: TaskViewModel, onFinished: () -> Unit) {
     var currentStep by remember { mutableStateOf(1) }
     val tasks by viewModel.brainDumpTasks.collectAsState()
-    val suggestedTasks by viewModel.suggestedTasks.collectAsState()
     val selectedPriorityIds by viewModel.selectedPriorityIds.collectAsState()
-    val hasSeenBackTapGuide by viewModel.hasSeenBackTapGuide.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadUnfinishedTasks()
+    }
 
     Scaffold { padding ->
         Column(
@@ -239,21 +326,17 @@ fun SetupFlow(viewModel: TaskViewModel, onFinished: () -> Unit) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            if (currentStep < 4) {
-                Text(
-                    text = "ZenStack Setup",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            Text(
+                text = "ZenStack Setup",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
             when (currentStep) {
                 1 -> BrainDumpStep(
                     tasks = tasks,
-                    suggestedTasks = suggestedTasks,
                     onAddTask = { viewModel.addTask(it) },
-                    onAddSuggestedTask = { viewModel.addSuggestedTask(it) },
                     onRemoveTask = { viewModel.removeTask(it) },
                     onNext = { if (tasks.isNotEmpty()) currentStep = 2 }
                 )
@@ -261,27 +344,11 @@ fun SetupFlow(viewModel: TaskViewModel, onFinished: () -> Unit) {
                     tasks = tasks,
                     selectedIds = selectedPriorityIds,
                     onTogglePriority = { viewModel.togglePriority(it) },
-                    onNext = { currentStep = 3 },
-                    onBack = { currentStep = 1 }
-                )
-                3 -> ConfirmationStep(
-                    tasks = tasks,
-                    selectedIds = selectedPriorityIds,
-                    onConfirm = {
+                    onNext = {
                         viewModel.saveSession()
-                        if (hasSeenBackTapGuide) {
-                            onFinished()
-                        } else {
-                            currentStep = 4
-                        }
-                    },
-                    onBack = { currentStep = 2 }
-                )
-                4 -> BackTapOnboarding(
-                    onGotIt = {
-                        viewModel.markBackTapGuideAsSeen()
                         onFinished()
-                    }
+                    },
+                    onBack = { currentStep = 1 }
                 )
             }
         }
@@ -293,9 +360,19 @@ fun CurrentTasksView(
     tasks: List<Task>,
     onRestart: () -> Unit,
     onToggleComplete: (Task) -> Unit,
-    onDeleteTask: (Task) -> Unit
+    onDeleteTask: (Task) -> Unit,
+    onAddTask: (String) -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
+    var newTaskText by remember { mutableStateOf("") }
+
+    val submitNewTask: () -> Unit = {
+        if (newTaskText.isNotBlank()) {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onAddTask(newTaskText)
+            newTaskText = ""
+        }
+    }
 
     val today = LocalDate.now()
     val zoneId = ZoneId.systemDefault()
@@ -305,20 +382,22 @@ fun CurrentTasksView(
         return Instant.ofEpochMilli(at).atZone(zoneId).toLocalDate() == today
     }
 
-    val priorityTasks = tasks.filter { it.isPriority && (it.status != "COMPLETED" || it.completedToday()) }
-    val otherTasks = tasks.filter { !it.isPriority && (it.status != "COMPLETED" || it.completedToday()) }
+    val activePriority = tasks.filter { it.isPriority && (it.status != "COMPLETED" || it.completedToday()) }
+    val activeBrainDump = tasks.filter { !it.isPriority && (it.status != "COMPLETED" || it.completedToday()) }
 
-    val allComplete = priorityTasks.isNotEmpty() && priorityTasks.all { it.status == "COMPLETED" }
-
-    // One-shot: only show confetti once when the transition to allComplete happens.
-    // Reset when tasks change (new session loaded).
+    val allPriorityDone = activePriority.isNotEmpty() && activePriority.all { it.status == "COMPLETED" }
     var confettiShown by remember(tasks.map { it.id }.toSet()) { mutableStateOf(false) }
-    val showConfetti = allComplete && !confettiShown
+    val showConfetti = allPriorityDone && !confettiShown
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(ZenDeepPurple)) {
         Scaffold(
+            containerColor = Color.Transparent,
             floatingActionButton = {
-                FloatingActionButton(onClick = onRestart) {
+                FloatingActionButton(
+                    onClick = onRestart,
+                    containerColor = ZenCardPurple,
+                    contentColor = Color.White
+                ) {
                     Icon(Icons.Default.Refresh, contentDescription = "New Session")
                 }
             }
@@ -327,46 +406,77 @@ fun CurrentTasksView(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(vertical = 16.dp)
             ) {
                 item {
-                    Text("Focus Mode", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                     Text(
-                        "Tasks Done: ${priorityTasks.count { it.status == "COMPLETED" }}/${priorityTasks.size}",
-                        style = MaterialTheme.typography.bodyMedium
+                        "Focus Mode",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
                     )
+                    Text(
+                        "${activePriority.count { it.status == "COMPLETED" }} / ${activePriority.size} priorities done",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.6f)
+                    )
+                    Spacer(Modifier.height(12.dp))
                 }
 
-                item { Text("Top 3 Priorities", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary) }
-
-                items(priorityTasks) { task ->
-                    TaskCard(
-                        task,
-                        isPriority = true,
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onToggleComplete(task)
-                        },
-                        onDelete = { onDeleteTask(task) }
-                    )
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = newTaskText,
+                            onValueChange = { newTaskText = it },
+                            modifier = Modifier.weight(1f),
+                            placeholder = { Text("Add a task...", color = Color.White.copy(alpha = 0.5f)) },
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedBorderColor = Color.White.copy(alpha = 0.6f),
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                                cursorColor = Color.White
+                            ),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(onDone = { submitNewTask() })
+                        )
+                        IconButton(onClick = { submitNewTask() }) {
+                            Icon(Icons.Default.Add, contentDescription = "Add task", tint = Color.White)
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
                 }
 
-                if (otherTasks.isNotEmpty()) {
-                    item { Spacer(modifier = Modifier.height(8.dp)) }
-                    item { Text("Brain Dump", style = MaterialTheme.typography.titleMedium) }
-                    items(otherTasks) { task ->
-                        TaskCard(
-                            task,
-                            isPriority = false,
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                onToggleComplete(task)
-                            },
-                            onDelete = { onDeleteTask(task) }
+                items(activePriority) { task ->
+                    TaskCard(task, isPriority = true,
+                        onClick = { haptic.performHapticFeedback(HapticFeedbackType.LongPress); onToggleComplete(task) },
+                        onDelete = { onDeleteTask(task) })
+                }
+
+                if (activeBrainDump.isNotEmpty()) {
+                    item {
+                        Text(
+                            "BRAIN DUMP",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color.White.copy(alpha = 0.5f),
+                            letterSpacing = androidx.compose.ui.unit.TextUnit(2f, androidx.compose.ui.unit.TextUnitType.Sp),
+                            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                         )
                     }
+                    items(activeBrainDump) { task ->
+                        TaskCard(task, isPriority = false,
+                            onClick = { haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove); onToggleComplete(task) },
+                            onDelete = { onDeleteTask(task) })
+                    }
                 }
+
             }
         }
 
@@ -391,33 +501,61 @@ fun CurrentTasksView(
 }
 
 @Composable
+private fun CircleCheckbox(checked: Boolean, onClick: () -> Unit, size: Dp = 36.dp) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(CircleShape)
+            .background(if (checked) ZenIndigo else Color.White)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (checked) {
+            Icon(
+                Icons.Default.Check,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(size * 0.55f)
+            )
+        }
+    }
+}
+
+@Composable
 fun TaskCard(task: Task, isPriority: Boolean, onClick: () -> Unit, onDelete: (() -> Unit)? = null) {
     val isCompleted = task.status == "COMPLETED"
     Surface(
         modifier = Modifier
             .fillMaxWidth()
+            .defaultMinSize(minHeight = if (isPriority) 72.dp else 0.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        color = if (isPriority) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-        tonalElevation = if (isPriority) 4.dp else 0.dp
+        shape = RoundedCornerShape(16.dp),
+        color = ZenCardPurple
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = if (isPriority) 14.dp else 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Checkbox(checked = isCompleted, onCheckedChange = { onClick() })
+            CircleCheckbox(
+                checked = isCompleted,
+                onClick = onClick,
+                size = if (isPriority) 36.dp else 32.dp
+            )
+            Spacer(Modifier.width(14.dp))
             Text(
                 text = task.title,
                 modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyLarge,
-                textDecoration = if (isCompleted) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
+                style = if (isPriority) MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge,
+                fontWeight = if (isPriority) FontWeight.Bold else FontWeight.Medium,
+                color = if (isCompleted) Color.White.copy(alpha = 0.45f) else Color.White,
+                textDecoration = if (isCompleted) TextDecoration.LineThrough else null
             )
-            if (onDelete != null && task.status != "COMPLETED") {
+            if (onDelete != null && !isCompleted) {
                 IconButton(onClick = onDelete) {
                     Icon(
                         Icons.Default.Delete,
                         contentDescription = "Delete task",
-                        tint = MaterialTheme.colorScheme.error
+                        tint = Color.White.copy(alpha = 0.4f)
                     )
                 }
             }
@@ -428,9 +566,7 @@ fun TaskCard(task: Task, isPriority: Boolean, onClick: () -> Unit, onDelete: (()
 @Composable
 fun BrainDumpStep(
     tasks: List<Task>,
-    suggestedTasks: List<Task>,
     onAddTask: (String) -> Unit,
-    onAddSuggestedTask: (Task) -> Unit,
     onRemoveTask: (Task) -> Unit,
     onNext: () -> Unit
 ) {
@@ -448,7 +584,7 @@ fun BrainDumpStep(
     Column(modifier = Modifier.fillMaxSize()) {
         Text("Brain Dump", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Text("Get everything out of your head.", style = MaterialTheme.typography.bodyMedium)
-        
+
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -472,29 +608,6 @@ fun BrainDumpStep(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Suggested Tasks
-        val filteredSuggestions = suggestedTasks.filter { sugg -> tasks.none { it.id == sugg.id } }
-        if (filteredSuggestions.isNotEmpty()) {
-            Text("Suggested for you", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-            Spacer(modifier = Modifier.height(8.dp))
-            androidx.compose.foundation.lazy.LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(horizontal = 4.dp)
-            ) {
-                items(filteredSuggestions) { task ->
-                    SuggestionChip(
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onAddSuggestedTask(task)
-                        },
-                        label = { Text(task.title) },
-                        icon = { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp)) }
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(tasks) { task ->
                 Surface(
@@ -509,7 +622,7 @@ fun BrainDumpStep(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            task.title, 
+                            task.title,
                             modifier = Modifier.weight(1f),
                             style = MaterialTheme.typography.bodyLarge
                         )
@@ -624,7 +737,7 @@ fun Power3Step(
                     modifier = Modifier.weight(1f),
                     enabled = selectedIds.isNotEmpty()
                 ) {
-                    Text("Next: Summary")
+                    Text("Set Focus")
                 }
             }
         }
@@ -654,42 +767,3 @@ fun Power3Step(
     }
 }
 
-@Composable
-fun ConfirmationStep(
-    tasks: List<Task>,
-    selectedIds: Set<Int>,
-    onConfirm: () -> Unit,
-    onBack: () -> Unit
-) {
-    val priorityTasks = tasks.filter { selectedIds.contains(it.id) }
-    val otherTasks = tasks.filter { !selectedIds.contains(it.id) }
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text("Step 3: Confirmation", style = MaterialTheme.typography.titleMedium)
-        
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Top Priorities", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-        priorityTasks.forEach { task ->
-            Text("• ${task.title}", modifier = Modifier.padding(start = 8.dp, top = 4.dp))
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Brain Dump", fontWeight = FontWeight.Bold)
-        otherTasks.forEach { task ->
-            Text("• ${task.title}", modifier = Modifier.padding(start = 8.dp, top = 4.dp), color = Color.Gray)
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) {
-                Text("Back")
-            }
-            Button(onClick = onConfirm, modifier = Modifier.weight(1f)) {
-                Text("Set Focus")
-            }
-        }
-    }
-}

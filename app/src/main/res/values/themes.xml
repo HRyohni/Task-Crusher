@@ -2,4 +2,11 @@
 <resources>
 
     <style name="Theme.OrganizationTool" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.OrganizationTool.Transparent" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 </resources>

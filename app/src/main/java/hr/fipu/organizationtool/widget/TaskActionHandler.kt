@@ -54,7 +54,7 @@ class ToggleTaskCallback : ActionCallback {
 
     private fun playSuccessSound(context: Context) {
         try {
-            val mp = MediaPlayer.create(context, hr.fipu.organizationtool.R.raw.zen_success)
+            val mp = MediaPlayer.create(context, hr.fipu.organizationtool.R.raw.success)
             mp?.apply {
                 start()
                 setOnCompletionListener { it.release() }

@@ -7,38 +7,47 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val ZenDarkColorScheme = darkColorScheme(
-    primary = ZenPrimary,
-    onPrimary = ZenOnPrimary,
-    secondary = ZenSecondary,
-    onSecondary = ZenOnSecondary,
-    tertiary = ZenTertiary,
-    onTertiary = ZenOnTertiary,
+    primary = ZenOrange,
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFF3D2800),
+    onPrimaryContainer = ZenOrangeLight,
+    secondary = ZenSlate,
+    onSecondary = Color.White,
+    tertiary = ZenGrayMedium,
+    onTertiary = Color.White,
     error = ZenError,
     onError = ZenOnError,
-    surface = ZenGrayDark,
-    background = ZenGrayDark,
+    surface = Color(0xFF1A1A1A),
+    background = Color(0xFF121212),
     onSurface = ZenWhite,
-    onBackground = ZenWhite
+    onBackground = ZenWhite,
+    surfaceVariant = Color(0xFF2C2C2C),
+    onSurfaceVariant = Color(0xFFCCCCCC)
 )
 
 private val ZenLightColorScheme = lightColorScheme(
-    primary = ZenPrimary,
-    onPrimary = ZenOnPrimary,
-    secondary = ZenSecondary,
-    onSecondary = ZenOnSecondary,
-    tertiary = ZenTertiary,
-    onTertiary = ZenOnTertiary,
+    primary = ZenOrange,
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFFFFF0DC),
+    onPrimaryContainer = Color(0xFF3D2800),
+    secondary = ZenSlate,
+    onSecondary = Color.White,
+    tertiary = ZenGrayMedium,
+    onTertiary = Color.White,
     error = ZenError,
     onError = ZenOnError,
     surface = ZenSurface,
     background = ZenBackground,
     onSurface = ZenGrayDark,
-    onBackground = ZenGrayDark
+    onBackground = ZenGrayDark,
+    surfaceVariant = Color(0xFFEEEEEE),
+    onSurfaceVariant = Color(0xFF444444)
 )
 
 @Composable

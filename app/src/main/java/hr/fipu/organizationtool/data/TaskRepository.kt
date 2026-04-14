@@ -42,4 +42,7 @@ class TaskRepository(private val taskDao: TaskDao) {
 
     fun getTasksCompletedOn(startOfDay: Long, endOfDay: Long): Flow<List<Task>> =
         taskDao.getTasksCompletedOn(startOfDay, endOfDay)
+
+    fun getTasksScheduledOn(startOfDay: Long, endOfDay: Long): Flow<List<Task>> =
+        taskDao.getTasksScheduledOn(startOfDay, endOfDay)
 }
