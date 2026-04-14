@@ -1,5 +1,6 @@
 package hr.fipu.organizationtool.ui
 
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
@@ -101,7 +103,7 @@ fun ZenStackApp(viewModel: TaskViewModel = koinViewModel(), openAchievementsTab:
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (showSetup || savedTasks == null) {
-            SetupFlow(viewModel) { showSetup = false }
+            SetupFlow(viewModel, onFinished = { showSetup = false }, onBack = { showSetup = false })
         } else {
             MainShell(
                 tasks = savedTasks!!,
@@ -168,7 +170,6 @@ fun MainShell(
                     selected = selectedTab == MainTab.TODAY,
                     onClick = { selectedTab = MainTab.TODAY },
                     icon = { Icon(Icons.Default.Home, contentDescription = "Today") },
-                    label = { Text("Today") },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = ZenIndigo,
                         selectedTextColor = ZenIndigo,
@@ -181,7 +182,6 @@ fun MainShell(
                     selected = selectedTab == MainTab.CALENDAR,
                     onClick = { selectedTab = MainTab.CALENDAR },
                     icon = { Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar") },
-                    label = { Text("Calendar") },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = ZenIndigo,
                         selectedTextColor = ZenIndigo,
@@ -194,7 +194,6 @@ fun MainShell(
                     selected = selectedTab == MainTab.ACHIEVEMENTS,
                     onClick = { selectedTab = MainTab.ACHIEVEMENTS },
                     icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Achievements") },
-                    label = { Text("Achievements") },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = ZenIndigo,
                         selectedTextColor = ZenIndigo,
@@ -310,7 +309,7 @@ fun AchievementUnlockBanner(achievement: Achievement, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun SetupFlow(viewModel: TaskViewModel, onFinished: () -> Unit) {
+fun SetupFlow(viewModel: TaskViewModel, onFinished: () -> Unit, onBack: () -> Unit) {
     var currentStep by remember { mutableStateOf(1) }
     val tasks by viewModel.brainDumpTasks.collectAsState()
     val selectedPriorityIds by viewModel.selectedPriorityIds.collectAsState()
@@ -326,19 +325,14 @@ fun SetupFlow(viewModel: TaskViewModel, onFinished: () -> Unit) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text(
-                text = "ZenStack Setup",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(16.dp))
 
             when (currentStep) {
                 1 -> BrainDumpStep(
                     tasks = tasks,
                     onAddTask = { viewModel.addTask(it) },
                     onRemoveTask = { viewModel.removeTask(it) },
-                    onNext = { if (tasks.isNotEmpty()) currentStep = 2 }
+                    onNext = { if (tasks.isNotEmpty()) currentStep = 2 },
+                    onBack = onBack
                 )
                 2 -> Power3Step(
                     tasks = tasks,
@@ -398,7 +392,7 @@ fun CurrentTasksView(
                     containerColor = ZenCardPurple,
                     contentColor = Color.White
                 ) {
-                    Icon(Icons.Default.Refresh, contentDescription = "New Session")
+                    Text("💸", style = MaterialTheme.typography.headlineMedium)
                 }
             }
         ) { padding ->
@@ -412,46 +406,38 @@ fun CurrentTasksView(
             ) {
                 item {
                     Text(
-                        "Focus Mode",
+                        "Focus Mode 💰",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        "${activePriority.count { it.status == "COMPLETED" }} / ${activePriority.size} priorities done",
+                        "${activePriority.count { it.status == "COMPLETED" }} / ${activePriority.size} important stuff done",
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.6f)
                     )
                     Spacer(Modifier.height(12.dp))
                 }
 
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = newTaskText,
-                            onValueChange = { newTaskText = it },
-                            modifier = Modifier.weight(1f),
-                            placeholder = { Text("Add a task...", color = Color.White.copy(alpha = 0.5f)) },
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Color.White,
-                                unfocusedTextColor = Color.White,
-                                focusedBorderColor = Color.White.copy(alpha = 0.6f),
-                                unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                                cursorColor = Color.White
-                            ),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            keyboardActions = KeyboardActions(onDone = { submitNewTask() })
-                        )
-                        IconButton(onClick = { submitNewTask() }) {
-                            Icon(Icons.Default.Add, contentDescription = "Add task", tint = Color.White)
+
+
+
+                if (activePriority.isEmpty() && activeBrainDump.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillParentMaxSize()
+                                .padding(bottom = 80.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "Great job! Don't stop now.\nAdd tasks with 💸",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White.copy(alpha = 0.7f),
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
-                    Spacer(Modifier.height(8.dp))
                 }
 
                 items(activePriority) { task ->
@@ -568,7 +554,8 @@ fun BrainDumpStep(
     tasks: List<Task>,
     onAddTask: (String) -> Unit,
     onRemoveTask: (Task) -> Unit,
-    onNext: () -> Unit
+    onNext: () -> Unit,
+    onBack: () -> Unit
 ) {
     var text by remember { mutableStateOf("") }
     val haptic = LocalHapticFeedback.current
@@ -582,8 +569,10 @@ fun BrainDumpStep(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Text("Brain Dump", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        Text("Get everything out of your head.", style = MaterialTheme.typography.bodyMedium)
+        TextButton(onClick = onBack) {
+            Text("← Brain Dump", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        }
+        Text("Get everything out of your head. I mean EVERYTHING.", style = MaterialTheme.typography.bodyMedium)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -592,7 +581,7 @@ fun BrainDumpStep(
             onValueChange = { text = it },
             modifier = Modifier.fillMaxWidth(),
             textStyle = MaterialTheme.typography.headlineSmall,
-            placeholder = { Text("What's on your mind?", style = MaterialTheme.typography.headlineSmall) },
+            placeholder = { Text("What's there to do?", style = MaterialTheme.typography.headlineSmall) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
@@ -627,7 +616,7 @@ fun BrainDumpStep(
                             style = MaterialTheme.typography.bodyLarge
                         )
                         IconButton(onClick = { onRemoveTask(task) }) {
-                            Icon(Icons.Default.Close, contentDescription = "Remove")
+                            Icon(Icons.Default.Delete, contentDescription = "Remove")
                         }
                     }
                 }
