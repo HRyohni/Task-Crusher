@@ -1,5 +1,5 @@
 # Task Crusher
-
+![task Crusher](screenshots/app.png)
 ## Tired of over-complicated organization apps that end up wasting your time instead of helping you get things done?
 
 **Task Crusher** is a simple, straight-to-the-point mobile app that doesn't waste your time. The goal is to spend as little time in the app as possible and as much time as possible actually crushing your tasks.
