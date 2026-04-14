@@ -4,6 +4,8 @@
 
 **Task Crusher** is a simple, straight-to-the-point mobile app that doesn't waste your time. The goal is to spend as little time in the app as possible and as much time as possible actually crushing your tasks.
 
+[![Download APK](https://img.shields.io/badge/Download-APK-green?style=for-the-badge&logo=android)](https://github.com/HRyohni/Task-Crusher/releases/latest)
+
 ---
 
 <p align="center">
